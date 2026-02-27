@@ -1,0 +1,2150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Electrical Trades AI — Playbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;500;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0b0d;
+    --bg2: #0f1115;
+    --bg3: #161820;
+    --surface: #1a1d27;
+    --surface2: #222536;
+    --border: #2a2e42;
+    --border-bright: #3a3f5c;
+    --amber: #f59e0b;
+    --amber-dim: #b47408;
+    --amber-glow: rgba(245,158,11,0.12);
+    --cyan: #22d3ee;
+    --cyan-dim: #0891b2;
+    --cyan-glow: rgba(34,211,238,0.1);
+    --red: #ef4444;
+    --green: #10b981;
+    --text: #e2e5f0;
+    --text-dim: #7a8096;
+    --text-muted: #4a5068;
+    --mono: 'Share Tech Mono', monospace;
+    --display: 'Barlow Condensed', sans-serif;
+    --body: 'Barlow', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-weight: 300;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ─── NOISE OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  /* ─── HEADER ─── */
+  .site-header {
+    position: relative;
+    border-bottom: 1px solid var(--border);
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .header-grid {
+    display: grid;
+    grid-template-columns: 1fr 3fr 1fr;
+    min-height: 180px;
+  }
+
+  .header-left {
+    border-right: 1px solid var(--border);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .volt-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--amber);
+    letter-spacing: 0.15em;
+    background: var(--amber-glow);
+    border: 1px solid var(--amber-dim);
+    padding: 4px 10px;
+    display: inline-block;
+    width: fit-content;
+  }
+
+  .header-center {
+    padding: 32px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+  }
+
+  .header-center::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, var(--amber-glow) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .site-title {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .site-title span {
+    color: var(--amber);
+    display: block;
+  }
+
+  .site-sub {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.12em;
+    margin-top: 12px;
+    text-transform: uppercase;
+  }
+
+  .header-right {
+    border-left: 1px solid var(--border);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-end;
+  }
+
+  .phase-counter {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+  }
+
+  .phase-num {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 3rem;
+    color: var(--border-bright);
+    line-height: 1;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    border-bottom: 1px solid var(--border);
+    background: var(--bg2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .nav-inner {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .nav-inner::-webkit-scrollbar { display: none; }
+
+  .nav-tab {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 16px 28px;
+    cursor: pointer;
+    border: none;
+    background: none;
+    border-right: 1px solid var(--border);
+    white-space: nowrap;
+    transition: color 0.2s, background 0.2s;
+    position: relative;
+  }
+
+  .nav-tab::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--amber);
+    transform: scaleX(0);
+    transition: transform 0.2s;
+  }
+
+  .nav-tab:hover { color: var(--text); background: var(--amber-glow); }
+  .nav-tab.active { color: var(--amber); }
+  .nav-tab.active::after { transform: scaleX(1); }
+
+  /* ─── MAIN ─── */
+  main { max-width: 1200px; margin: 0 auto; padding: 0 24px 80px; }
+
+  .section {
+    display: none;
+    animation: fadeUp 0.4s ease;
+  }
+
+  .section.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── SECTION HEADER ─── */
+  .section-header {
+    padding: 48px 0 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 24px;
+    align-items: end;
+  }
+
+  .section-num {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 5rem;
+    line-height: 1;
+    color: var(--border);
+  }
+
+  .section-meta { padding-bottom: 6px; }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--amber);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .section-title {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1.1;
+  }
+
+  .section-desc {
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    margin-top: 10px;
+    max-width: 600px;
+  }
+
+  /* ─── CARDS ─── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 28px;
+    margin-bottom: 20px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: var(--border-bright); }
+
+  .card-accent-amber::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--amber);
+  }
+
+  .card-accent-cyan::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--cyan);
+  }
+
+  .card-accent-red::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--red);
+  }
+
+  .card-accent-green::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--green);
+  }
+
+  .card-title {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  .card-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  /* ─── GRID LAYOUTS ─── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+  @media (max-width: 768px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .header-grid { grid-template-columns: 1fr; }
+    .header-left, .header-right { display: none; }
+  }
+
+  /* ─── SCRIPT SECTION ─── */
+  .script-block {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 0;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .script-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .script-tag {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    padding: 3px 10px;
+    border: 1px solid;
+    text-transform: uppercase;
+  }
+
+  .tag-interviewer { color: var(--amber); border-color: var(--amber-dim); background: var(--amber-glow); }
+  .tag-signal { color: var(--cyan); border-color: var(--cyan-dim); background: var(--cyan-glow); }
+  .tag-probe { color: var(--green); border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.08); }
+  .tag-warning { color: var(--red); border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.08); }
+
+  .script-title {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .script-body { padding: 24px; }
+
+  .question {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text);
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+
+  .question::before {
+    content: '"';
+    color: var(--amber);
+    font-size: 1.4rem;
+    margin-right: 2px;
+  }
+
+  .question::after {
+    content: '"';
+    color: var(--amber);
+    font-size: 1.4rem;
+    margin-left: 2px;
+  }
+
+  .signal-list {
+    list-style: none;
+    margin-top: 14px;
+  }
+
+  .signal-list li {
+    padding: 6px 0 6px 20px;
+    position: relative;
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .signal-list li:last-child { border-bottom: none; }
+
+  .signal-list li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--amber);
+    font-family: var(--mono);
+  }
+
+  .signal-list li.green::before { color: var(--green); content: '✓'; }
+  .signal-list li.red::before { color: var(--red); content: '✗'; }
+
+  /* ─── SPRINT SECTION ─── */
+  .sprint-timeline {
+    position: relative;
+    padding-left: 48px;
+    margin-bottom: 32px;
+  }
+
+  .sprint-timeline::before {
+    content: '';
+    position: absolute;
+    left: 16px;
+    top: 8px;
+    bottom: 8px;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--amber), var(--cyan));
+  }
+
+  .sprint-week {
+    position: relative;
+    margin-bottom: 24px;
+  }
+
+  .sprint-week::before {
+    content: attr(data-week);
+    position: absolute;
+    left: -40px;
+    top: 8px;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--amber);
+    letter-spacing: 0.1em;
+    background: var(--bg);
+    padding: 2px 0;
+  }
+
+  .sprint-dot {
+    position: absolute;
+    left: -52px;
+    top: 10px;
+    width: 8px;
+    height: 8px;
+    background: var(--amber);
+    border: 2px solid var(--bg);
+    border-radius: 50%;
+  }
+
+  .sprint-week.cyan .sprint-dot { background: var(--cyan); }
+
+  .sprint-week-title {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+
+  .sprint-tasks {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .task {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .task-icon {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-muted);
+    min-width: 24px;
+  }
+
+  /* ─── ARCHITECTURE ─── */
+  .arch-diagram {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 32px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .arch-diagram::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 28px,
+      rgba(255,255,255,0.015) 28px,
+      rgba(255,255,255,0.015) 29px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 28px,
+      rgba(255,255,255,0.015) 28px,
+      rgba(255,255,255,0.015) 29px
+    );
+    pointer-events: none;
+  }
+
+  .arch-layer {
+    margin-bottom: 16px;
+    position: relative;
+  }
+
+  .arch-layer-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .arch-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .arch-node {
+    background: var(--surface2);
+    border: 1px solid var(--border-bright);
+    padding: 10px 16px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text);
+    position: relative;
+    transition: all 0.2s;
+    cursor: default;
+  }
+
+  .arch-node:hover {
+    border-color: var(--amber);
+    color: var(--amber);
+    background: var(--amber-glow);
+  }
+
+  .arch-node.amber { border-color: var(--amber-dim); color: var(--amber); background: var(--amber-glow); }
+  .arch-node.cyan { border-color: var(--cyan-dim); color: var(--cyan); background: var(--cyan-glow); }
+  .arch-node.green { border-color: rgba(16,185,129,0.4); color: var(--green); background: rgba(16,185,129,0.08); }
+  .arch-node.red { border-color: rgba(239,68,68,0.4); color: var(--red); background: rgba(239,68,68,0.08); }
+
+  .arch-connector {
+    text-align: center;
+    padding: 6px 0;
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--border-bright);
+  }
+
+  /* ─── BET COMPARISON ─── */
+  .bet-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border: 1px solid var(--border);
+    margin-bottom: 32px;
+    overflow: hidden;
+  }
+
+  .bet-col {
+    padding: 24px 28px;
+    border-right: 1px solid var(--border);
+  }
+
+  .bet-col:last-child { border-right: none; }
+
+  .bet-badge {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    padding: 4px 12px;
+    border: 1px solid;
+    display: inline-block;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+
+  .bet-badge-a { color: var(--amber); border-color: var(--amber-dim); background: var(--amber-glow); }
+  .bet-badge-b { color: var(--cyan); border-color: var(--cyan-dim); background: var(--cyan-glow); }
+
+  .bet-name {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 1.6rem;
+    text-transform: uppercase;
+    line-height: 1.1;
+  }
+
+  .bet-tagline {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    margin-top: 6px;
+  }
+
+  /* ─── METRICS ROW ─── */
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border: 1px solid var(--border);
+    margin-bottom: 32px;
+    overflow: hidden;
+  }
+
+  .metric {
+    padding: 20px 24px;
+    border-right: 1px solid var(--border);
+  }
+
+  .metric:last-child { border-right: none; }
+
+  .metric-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text-muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .metric-value {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 1.6rem;
+    color: var(--amber);
+    line-height: 1;
+  }
+
+  .metric-sub {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  /* ─── TABS WITHIN SECTIONS ─── */
+  .inner-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 24px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .inner-tab {
+    flex: 1;
+    padding: 12px 16px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: none;
+    border: none;
+    border-right: 1px solid var(--border);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .inner-tab:last-child { border-right: none; }
+  .inner-tab:hover { background: var(--amber-glow); color: var(--text); }
+  .inner-tab.active { background: var(--amber-glow); color: var(--amber); }
+
+  .inner-panel { display: none; }
+  .inner-panel.active { display: block; animation: fadeUp 0.3s ease; }
+
+  /* ─── RISK / TRADEOFF TABLE ─── */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 24px;
+  }
+
+  .compare-table th {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 10px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg3);
+  }
+
+  .compare-table td {
+    padding: 12px 16px;
+    font-size: 0.875rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-dim);
+    vertical-align: top;
+  }
+
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table td:first-child { color: var(--text); font-weight: 500; font-family: var(--display); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.03em; }
+
+  .compare-table .win { color: var(--green); }
+  .compare-table .lose { color: var(--red); }
+  .compare-table .neutral { color: var(--amber); }
+
+  /* ─── CALLOUT ─── */
+  .callout {
+    background: var(--amber-glow);
+    border: 1px solid var(--amber-dim);
+    border-left: 4px solid var(--amber);
+    padding: 20px 24px;
+    margin: 24px 0;
+  }
+
+  .callout.cyan {
+    background: var(--cyan-glow);
+    border-color: var(--cyan-dim);
+    border-left-color: var(--cyan);
+  }
+
+  .callout-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--amber);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .callout.cyan .callout-label { color: var(--cyan); }
+
+  .callout p {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* ─── PERSONA CARDS ─── */
+  .persona-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+
+  .persona-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 20px;
+  }
+
+  .persona-role {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--amber);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .persona-name {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .persona-detail {
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+
+  /* ─── FLOW CHART ─── */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    align-items: stretch;
+    margin: 24px 0;
+  }
+
+  .flow-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 16px 20px;
+    position: relative;
+  }
+
+  .flow-item.highlight { border-color: var(--amber-dim); background: var(--amber-glow); }
+  .flow-item.highlight-cyan { border-color: var(--cyan-dim); background: var(--cyan-glow); }
+
+  .flow-arrow {
+    text-align: center;
+    padding: 6px 0;
+    font-family: var(--mono);
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+
+  .flow-title {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+
+  .flow-desc {
+    font-size: 0.84rem;
+    color: var(--text-dim);
+  }
+
+  /* ─── VERDICT ─── */
+  .verdict-box {
+    border: 1px solid var(--border);
+    overflow: hidden;
+    margin-top: 40px;
+  }
+
+  .verdict-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .verdict-body {
+    padding: 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .verdict-item { }
+
+  .verdict-label {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+
+  .verdict-item.amber .verdict-label { color: var(--amber); }
+  .verdict-item.cyan .verdict-label { color: var(--cyan); }
+
+  .verdict-desc {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  /* ─── FOOTER ─── */
+  .site-footer {
+    border-top: 1px solid var(--border);
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .footer-left {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+  }
+
+  .footer-right {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border-bright); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--amber-dim); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-grid">
+    <div class="header-left">
+      <span class="volt-badge">⚡ FIELD OPS AI</span>
+      <div style="font-family: var(--mono); font-size: 9px; color: var(--text-muted); letter-spacing: 0.1em;">REV 1.0 / 2026</div>
+    </div>
+    <div class="header-center">
+      <div class="site-title">Electrical Trades<span>AI Agency</span></div>
+      <div class="site-sub">Discovery Script · Sprint Blueprints · Platform Architecture</div>
+    </div>
+    <div class="header-right">
+      <div class="phase-counter">PLAYBOOK PHASES</div>
+      <div class="phase-num">4</div>
+    </div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <button class="nav-tab active" onclick="showSection('overview')">01 Overview</button>
+    <button class="nav-tab" onclick="showSection('script')">02 Discovery Script</button>
+    <button class="nav-tab" onclick="showSection('sprint')">03 Sprint Blueprints</button>
+    <button class="nav-tab" onclick="showSection('bet-a')">04 Bet A — Estimating</button>
+    <button class="nav-tab" onclick="showSection('bet-b')">05 Bet B — Field Intel</button>
+    <button class="nav-tab" onclick="showSection('verdict')">06 Decision Framework</button>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main>
+
+<!-- ═══════ OVERVIEW ═══════ -->
+<section id="overview" class="section active">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div class="section-meta">
+      <div class="section-label">Start Here</div>
+      <div class="section-title">The Playbook</div>
+      <div class="section-desc">Three tools to take you from zero paying clients to a productized platform. Use this guide in sequence — each phase feeds the next.</div>
+    </div>
+  </div>
+
+  <div class="metrics">
+    <div class="metric">
+      <div class="metric-label">ICP Revenue</div>
+      <div class="metric-value">$2M–$50M</div>
+      <div class="metric-sub">Electrical contractors</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Agency ARR Target</div>
+      <div class="metric-value">$200K</div>
+      <div class="metric-sub">By month 12</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Platform Target</div>
+      <div class="metric-value">$500K</div>
+      <div class="metric-sub">ARR by month 18</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Platform Bet Options</div>
+      <div class="metric-value">2</div>
+      <div class="metric-sub">Agency phase decides</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <div class="card card-accent-amber">
+        <div class="card-label">Phase 1</div>
+        <div class="card-title">Discovery Interview Script</div>
+        <p style="font-size:0.875rem; color:var(--text-dim);">A structured 45-min conversation framework for 20–30 contractor interviews. Three layers — visible pain, dollar pain, workaround — reveal which problems are real enough to pay for.</p>
+        <div style="margin-top:14px;">
+          <button onclick="showSection('script')" style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;background:var(--amber-glow);border:1px solid var(--amber-dim);color:var(--amber);padding:8px 16px;cursor:pointer;text-transform:uppercase;">VIEW SCRIPT →</button>
+        </div>
+      </div>
+
+      <div class="card card-accent-amber">
+        <div class="card-label">Phase 2–3</div>
+        <div class="card-title">Agency Sprint Blueprint</div>
+        <p style="font-size:0.875rem; color:var(--text-dim);">6-week automation sprints that deliver real ROI using existing tools (Claude API, Make, ERP integrations). You get paid to learn, and each sprint builds your case study library.</p>
+        <div style="margin-top:14px;">
+          <button onclick="showSection('sprint')" style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;background:var(--amber-glow);border:1px solid var(--amber-dim);color:var(--amber);padding:8px 16px;cursor:pointer;text-transform:uppercase;">VIEW SPRINT →</button>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card card-accent-cyan">
+        <div class="card-label">Phase 4 — Bet A</div>
+        <div class="card-title">Estimating Intelligence Layer</div>
+        <p style="font-size:0.875rem; color:var(--text-dim);">An AI layer that augments existing estimating software. Lower switching friction. Sells to estimators and ops managers. Easiest to close, lower stickiness.</p>
+        <div style="margin-top:14px;">
+          <button onclick="showSection('bet-a')" style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;background:var(--cyan-glow);border:1px solid var(--cyan-dim);color:var(--cyan);padding:8px 16px;cursor:pointer;text-transform:uppercase;">VIEW ARCHITECTURE →</button>
+        </div>
+      </div>
+
+      <div class="card card-accent-cyan">
+        <div class="card-label">Phase 4 — Bet B</div>
+        <div class="card-title">Field Intelligence Hub</div>
+        <p style="font-size:0.875rem; color:var(--text-dim);">A mobile-first platform replacing spreadsheets for foremen and PMs. Higher switching cost to adopt, but near-impossible to replace once embedded. Sells to owners.</p>
+        <div style="margin-top:14px;">
+          <button onclick="showSection('bet-b')" style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;background:var(--cyan-glow);border:1px solid var(--cyan-dim);color:var(--cyan);padding:8px 16px;cursor:pointer;text-transform:uppercase;">VIEW ARCHITECTURE →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top:12px;">
+    <div class="callout-label">Your Unfair Advantage</div>
+    <p>"I've pulled wire. I've done hand takeoffs. I know what it costs when an estimator is wrong by 10%. I also spent six years selling AI to enterprises that deploy at scale. Nobody in this space has both." — Lead with this in every NECA meeting, every cold email, every LinkedIn post.</p>
+  </div>
+</section>
+
+<!-- ═══════ DISCOVERY SCRIPT ═══════ -->
+<section id="script" class="section">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div class="section-meta">
+      <div class="section-label">Phase 1 · Months 1–2</div>
+      <div class="section-title">Discovery Interview Script</div>
+      <div class="section-desc">A 45-minute structured conversation. Run 20–30 of these. The goal is not to pitch — it's to find which pains are acute enough to write a check.</div>
+    </div>
+  </div>
+
+  <!-- BUYER PERSONAS -->
+  <div style="margin-bottom:32px;">
+    <div style="font-family:var(--mono);font-size:10px;color:var(--amber);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:16px;">Target Buyer Personas</div>
+    <div class="persona-grid">
+      <div class="persona-card">
+        <div class="persona-role">Primary ICP</div>
+        <div class="persona-name">The Owner / GM</div>
+        <div class="persona-detail">🏢 $2M–$50M electrical contractor</div>
+        <div class="persona-detail">🎯 Cares about: margin, winning bids</div>
+        <div class="persona-detail">😤 Hates: estimator turnover, job overruns</div>
+        <div class="persona-detail">💰 Budget authority: Yes</div>
+      </div>
+      <div class="persona-card">
+        <div class="persona-role">Secondary ICP</div>
+        <div class="persona-name">Lead Estimator</div>
+        <div class="persona-detail">📐 3–20 yrs experience, overloaded</div>
+        <div class="persona-detail">🎯 Cares about: speed, accuracy, stress</div>
+        <div class="persona-detail">😤 Hates: manual takeoff, scope creep</div>
+        <div class="persona-detail">💰 Budget authority: Influence only</div>
+      </div>
+      <div class="persona-card">
+        <div class="persona-role">Tertiary ICP</div>
+        <div class="persona-name">Project Manager / Foreman</div>
+        <div class="persona-detail">⚡ Manages 2–8 active jobs</div>
+        <div class="persona-detail">🎯 Cares about: crew, schedule, docs</div>
+        <div class="persona-detail">😤 Hates: paperwork, change orders</div>
+        <div class="persona-detail">💰 Budget authority: None, but daily user</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPENING -->
+  <div class="script-block">
+    <div class="script-header">
+      <span class="script-tag tag-interviewer">Opener</span>
+      <span class="script-title">Set the Frame (5 min)</span>
+    </div>
+    <div class="script-body">
+      <div class="question">Hey, I'm doing research — not selling anything. I spent years as an apprentice before moving into enterprise tech, and I want to understand what's broken in the trades from people who actually run shops. Mind if I ask some direct questions?</div>
+      <ul class="signal-list" style="margin-top:12px;">
+        <li class="green">They relax when you say "not selling anything"</li>
+        <li class="green">Mentioning your electrical background builds instant credibility</li>
+        <li class="red">Do NOT mention AI in the opener — let them bring it up or let it surface naturally</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- LAYER 1 -->
+  <div style="font-family:var(--mono);font-size:10px;color:var(--amber);letter-spacing:0.2em;text-transform:uppercase;margin:24px 0 12px;">Layer 1 — The Visible Pain (10 min)</div>
+
+  <div class="script-block">
+    <div class="script-header">
+      <span class="script-tag tag-interviewer">Q1</span>
+      <span class="script-title">Walk me through a typical week during bid season</span>
+    </div>
+    <div class="script-body">
+      <div class="question">Walk me through a typical week during bid season. What does your estimating process actually look like day-to-day?</div>
+      <ul class="signal-list">
+        <li>Count how many times they mention "manual" or "spreadsheet" — high count = opportunity</li>
+        <li>Note which steps they describe first — primary pain surfaces early</li>
+        <li class="green">Listen for: "we lose a lot of bids we shouldn't" or "we win bids we shouldn't have"</li>
+        <li class="red">Avoid: jumping to solutions when they describe a problem</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="script-block">
+    <div class="script-header">
+      <span class="script-tag tag-interviewer">Q2</span>
+      <span class="script-title">Who does the takeoff when your lead estimator is out?</span>
+    </div>
+    <div class="script-body">
+      <div class="question">Who does the takeoff when your lead estimator is out sick or quits? What happens to the knowledge they carry?</div>
+      <ul class="signal-list">
+        <li>Estimator dependency = a recurring nightmare for most shops under $10M</li>
+        <li class="green">Strong signal: "We had to pull someone from the field" or "We missed that bid"</li>
+        <li class="green">Even stronger: "We almost lost everything when [name] left"</li>
+        <li>Follow-up: "Have you ever tried to document their process? What happened?"</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="script-block">
+    <div class="script-header">
+      <span class="script-tag tag-interviewer">Q3</span>
+      <span class="script-title">Field operations question</span>
+    </div>
+    <div class="script-body">
+      <div class="question">When a foreman is done for the day, what does his reporting process look like? How do you know if a job is running over hours?</div>
+      <ul class="signal-list">
+        <li>Most will describe: text messages, paper timesheets, or "I call him"</li>
+        <li class="green">Variance discovery lag is the key metric — ask "how many days after a problem starts do you find out?"</li>
+        <li>Follow-up: "What was the last job that surprised you on cost? What happened?"</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- LAYER 2 -->
+  <div style="font-family:var(--mono);font-size:10px;color:var(--amber);letter-spacing:0.2em;text-transform:uppercase;margin:32px 0 12px;">Layer 2 — The Dollar Pain (15 min)</div>
+
+  <div class="script-block">
+    <div class="script-header">
+      <span class="script-tag tag-probe">PROBE</span>
+      <span class="script-title">Qualify the cost — make it real</span>
+    </div>
+    <div class="script-body">
+      <div class="question">Tell me about a job in the last year where the margin was nothing like you expected. What happened?</div>
+      <ul class="signal-list">
+        <li>Get a story, not a category. Stories contain real dollar figures.</li>
+        <li>As they tell the story, probe: "What do you estimate that cost you in gross margin?"</li>
+        <li class="green">If they say a specific number, you've found a qualified buyer — they've already done the math</li>
+        <li>Follow-up: "Does that happen once a year? Every quarter? More?"</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="script-block">
+    <div class="script-header">
+      <span class="script-tag tag-probe">PROBE</span>
+      <span class="script-title">Quantify estimating errors</span>
+    </div>
+    <div class="script-body">
+      <div class="question">If your estimating was 5% more accurate across all bids, what would that mean for your business in a year?</div>
+      <ul class="signal-list">
+        <li>This forces them to calculate ROI themselves — the most powerful sales move</li>
+        <li class="green">A $5M revenue shop with 10% net margin = $500K net. 5% improvement = $25K/yr minimum. Easy ROI case.</li>
+        <li>Write down their number. Reference it in your follow-up proposal.</li>
+        <li class="red">Don't challenge their number — it anchors your value</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="script-block">
+    <div class="script-header">
+      <span class="script-tag tag-probe">PROBE</span>
+      <span class="script-title">Change order leakage</span>
+    </div>
+    <div class="script-body">
+      <div class="question">Roughly what percentage of your change orders actually get billed and collected vs. absorbed as extra work?</div>
+      <ul class="signal-list">
+        <li>Industry average: contractors absorb 40–60% of legitimate change orders as goodwill or because they can't document fast enough</li>
+        <li class="green">If they don't know the percentage — that's your opening: "That's exactly what I want to help you figure out"</li>
+        <li>Follow-up: "What does it usually take to get a change order approved by the GC?"</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- LAYER 3 -->
+  <div style="font-family:var(--mono);font-size:10px;color:var(--amber);letter-spacing:0.2em;text-transform:uppercase;margin:32px 0 12px;">Layer 3 — The Workaround (10 min)</div>
+
+  <div class="callout">
+    <div class="callout-label">Why Layer 3 is the Most Valuable</div>
+    <p>What they've already tried tells you: (1) they've validated the problem is real enough to spend on, (2) existing solutions aren't good enough, and (3) exactly what your product needs to beat. Someone who "tried Procore and gave up" is a warm lead, not a skeptic.</p>
+  </div>
+
+  <div class="script-block">
+    <div class="script-header">
+      <span class="script-tag tag-probe">PROBE</span>
+      <span class="script-title">Map existing tools and failures</span>
+    </div>
+    <div class="script-body">
+      <div class="question">What software are you running right now for estimating and project management? And honestly — what do you hate about it?</div>
+      <ul class="signal-list">
+        <li>Most common answer: Accubid or ConEst for estimating, something else for PM, lots of Excel</li>
+        <li class="green">Any mention of "we stopped using it after 3 months" = product-market fit gap you can fill</li>
+        <li>Follow-up: "What would make you replace it tomorrow if something better existed?"</li>
+        <li class="green">That answer IS your product roadmap</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="script-block">
+    <div class="script-header">
+      <span class="script-tag tag-probe">PROBE</span>
+      <span class="script-title">The budget question (closing the interview)</span>
+    </div>
+    <div class="script-body">
+      <div class="question">If a tool could save you [their dollar number from Layer 2] per year, what would you reasonably pay monthly for it?</div>
+      <ul class="signal-list">
+        <li>Most small contractors think in terms of $0–$500/month. That's fine — it informs your pricing tier.</li>
+        <li class="green">If they say $1,000+/month unprompted, you're talking to a growth-mode operator — qualify harder</li>
+        <li>Final question: "Would you be open to being a design partner? I'd give you early access in exchange for 2 hours/month of feedback calls."</li>
+        <li class="green">Design partners = your first 5 agency clients</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SCORING -->
+  <div style="font-family:var(--mono);font-size:10px;color:var(--amber);letter-spacing:0.2em;text-transform:uppercase;margin:32px 0 12px;">Lead Scoring After Each Interview</div>
+  <div class="grid-3">
+    <div class="card card-accent-green">
+      <div class="card-label">Tier A — Move Fast</div>
+      <div class="card-title" style="color:var(--green);">Hot Prospect</div>
+      <ul class="signal-list">
+        <li>Named a specific dollar loss</li>
+        <li>Currently using 2+ disconnected tools</li>
+        <li>Expressed interest in being a design partner</li>
+      </ul>
+    </div>
+    <div class="card card-accent-amber">
+      <div class="card-label">Tier B — Nurture</div>
+      <div class="card-title">Qualified</div>
+      <ul class="signal-list">
+        <li>Described the pain but no dollar figure</li>
+        <li>Open to the conversation but no urgency</li>
+        <li>Follow up after 3 case studies exist</li>
+      </ul>
+    </div>
+    <div class="card card-accent-red">
+      <div class="card-label">Tier C — Park It</div>
+      <div class="card-title" style="color:var(--red);">Not Ready</div>
+      <ul class="signal-list">
+        <li>"We have a system that works fine"</li>
+        <li>Less than $2M revenue — no budget</li>
+        <li>Owner not in the interview</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ SPRINT BLUEPRINTS ═══════ -->
+<section id="sprint" class="section">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div class="section-meta">
+      <div class="section-label">Phase 3 · Months 3–8</div>
+      <div class="section-title">Agency Sprint Blueprints</div>
+      <div class="section-desc">Two highest-priority automation sprints aligned to your two eventual platform bets. Run these as paid agency engagements before building anything custom.</div>
+    </div>
+  </div>
+
+  <div class="inner-tabs">
+    <button class="inner-tab active" onclick="showInner('sprint', 'sprint-a')">Sprint A — Estimating AI</button>
+    <button class="inner-tab" onclick="showInner('sprint', 'sprint-b')">Sprint B — Field Ops AI</button>
+    <button class="inner-tab" onclick="showInner('sprint', 'sprint-stack')">Tool Stack</button>
+  </div>
+
+  <!-- SPRINT A -->
+  <div id="sprint-a" class="inner-panel active">
+    <div class="grid-2" style="margin-bottom:32px;">
+      <div class="card card-accent-amber">
+        <div class="card-label">Sprint A Details</div>
+        <div class="card-title">Estimating AI Assistant</div>
+        <div class="persona-detail" style="margin-top:8px;">⏱ Duration: 5–6 weeks</div>
+        <div class="persona-detail">💵 Price: $15,000–$25,000</div>
+        <div class="persona-detail">👤 Buyer: Owner or Lead Estimator</div>
+        <div class="persona-detail">🏆 Outcome: 30–50% faster first-draft estimates</div>
+      </div>
+      <div class="card card-accent-amber">
+        <div class="card-label">Problem Being Solved</div>
+        <div class="card-title">Manual Takeoff is a Bottleneck</div>
+        <p style="font-size:0.875rem;color:var(--text-dim);">Estimators spend 60–70% of their time on mechanical count/measure work from PDF plans, not on the strategic pricing that actually wins bids. When they leave, that tribal knowledge walks out the door.</p>
+      </div>
+    </div>
+
+    <div style="font-family:var(--mono);font-size:10px;color:var(--amber);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:16px;">Sprint Timeline</div>
+
+    <div class="sprint-timeline">
+      <div class="sprint-week" data-week="WK1">
+        <div class="sprint-dot"></div>
+        <div class="sprint-week-title">Discovery & Baseline</div>
+        <div class="sprint-tasks">
+          <div class="task"><span class="task-icon">01</span>Audit current estimating workflow end-to-end with the lead estimator</div>
+          <div class="task"><span class="task-icon">02</span>Collect 10–15 historical bid documents (won and lost) for training examples</div>
+          <div class="task"><span class="task-icon">03</span>Map data inputs: PDF plans, labor rates spreadsheet, material price lists, historical job costs</div>
+          <div class="task"><span class="task-icon">04</span>Define the "baseline estimate" format the shop already uses — don't reinvent it</div>
+        </div>
+      </div>
+
+      <div class="sprint-week" data-week="WK2">
+        <div class="sprint-dot"></div>
+        <div class="sprint-week-title">Document Intelligence Pipeline</div>
+        <div class="sprint-tasks">
+          <div class="task"><span class="task-icon">01</span>Build PDF → structured data extraction using Claude API (scope, square footage, panel schedules)</div>
+          <div class="task"><span class="task-icon">02</span>Extract electrical symbols, fixture counts, circuit descriptions from plan sheets</div>
+          <div class="task"><span class="task-icon">03</span>Connect to labor rate database (usually an Excel file) via Make.com automation</div>
+          <div class="task"><span class="task-icon">04</span>Validate extraction accuracy against 3 historical bids — target 80%+ count accuracy</div>
+        </div>
+      </div>
+
+      <div class="sprint-week" data-week="WK3">
+        <div class="sprint-dot"></div>
+        <div class="sprint-week-title">Estimate Draft Generator</div>
+        <div class="sprint-tasks">
+          <div class="task"><span class="task-icon">01</span>Build prompt chain: extracted scope → labor hours estimate → material BOM → total bid</div>
+          <div class="task"><span class="task-icon">02</span>Inject historical job cost data as context — "similar jobs ran X hours per unit"</div>
+          <div class="task"><span class="task-icon">03</span>Output draft estimate in the shop's existing format (usually Excel or PDF)</div>
+          <div class="task"><span class="task-icon">04</span>Add confidence flags — items the AI is uncertain about get flagged for human review</div>
+        </div>
+      </div>
+
+      <div class="sprint-week cyan" data-week="WK4">
+        <div class="sprint-dot"></div>
+        <div class="sprint-week-title">Bid Risk Analysis Module</div>
+        <div class="sprint-tasks">
+          <div class="task"><span class="task-icon">01</span>Layer in scope ambiguity detection — clauses that usually lead to change orders</div>
+          <div class="task"><span class="task-icon">02</span>Add material price volatility alerts (wire, panel, conduit pricing from supplier API or scrape)</div>
+          <div class="task"><span class="task-icon">03</span>Compare bid against historical win/loss patterns — "last 5 similar jobs: 3 won at X margin"</div>
+          <div class="task"><span class="task-icon">04</span>Generate a one-page bid risk summary the estimator reviews before submission</div>
+        </div>
+      </div>
+
+      <div class="sprint-week cyan" data-week="WK5-6">
+        <div class="sprint-dot"></div>
+        <div class="sprint-week-title">Live Testing + Change Order Draft Bot</div>
+        <div class="sprint-tasks">
+          <div class="task"><span class="task-icon">01</span>Estimator uses tool on 3 real live bids — capture time savings and delta vs. manual estimate</div>
+          <div class="task"><span class="task-icon">02</span>Build change order generator: foreman texts scope change → AI drafts formatted CO in 2 min</div>
+          <div class="task"><span class="task-icon">03</span>Document ROI: hours saved × estimator hourly rate + margin delta on test bids</div>
+          <div class="task"><span class="task-icon">04</span>Deliver case study + roadmap for platform upgrade pitch</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">Sprint A Deliverable</div>
+      <p>Client gets: (1) AI estimating assistant connected to their existing files, (2) bid risk summary template, (3) change order draft bot via text message. You get: real usage data, measured ROI, a case study, and validation of the Bet A platform thesis.</p>
+    </div>
+  </div>
+
+  <!-- SPRINT B -->
+  <div id="sprint-b" class="inner-panel">
+    <div class="grid-2" style="margin-bottom:32px;">
+      <div class="card card-accent-cyan">
+        <div class="card-label">Sprint B Details</div>
+        <div class="card-title">Field Ops Intelligence</div>
+        <div class="persona-detail" style="margin-top:8px;">⏱ Duration: 5–6 weeks</div>
+        <div class="persona-detail">💵 Price: $12,000–$20,000</div>
+        <div class="persona-detail">👤 Buyer: Owner (PM is daily user)</div>
+        <div class="persona-detail">🏆 Outcome: Real-time job cost variance detection</div>
+      </div>
+      <div class="card card-accent-cyan">
+        <div class="card-label">Problem Being Solved</div>
+        <div class="card-title">Owners Find Out Too Late</div>
+        <p style="font-size:0.875rem;color:var(--text-dim);">By the time a job cost variance is discovered, it's usually too late to fix. Foremen aren't logging hours accurately. PMs are living in their trucks. No one is looking at bid vs. actual until the job is done.</p>
+      </div>
+    </div>
+
+    <div style="font-family:var(--mono);font-size:10px;color:var(--cyan);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:16px;">Sprint Timeline</div>
+
+    <div class="sprint-timeline">
+      <div class="sprint-week" data-week="WK1">
+        <div class="sprint-dot" style="background:var(--cyan)"></div>
+        <div class="sprint-week-title">Baseline Current Field Reporting</div>
+        <div class="sprint-tasks">
+          <div class="task"><span class="task-icon">01</span>Spend a day on a job site — ride with a foreman through their end-of-day routine</div>
+          <div class="task"><span class="task-icon">02</span>Document: how hours are tracked, how materials are requested, how daily reports are filed</div>
+          <div class="task"><span class="task-icon">03</span>Pull last 6 months of job cost data and map variance patterns — which job types run over?</div>
+          <div class="task"><span class="task-icon">04</span>Identify the lowest-friction reporting method foremen will actually use (text is usually the answer)</div>
+        </div>
+      </div>
+
+      <div class="sprint-week" data-week="WK2">
+        <div class="sprint-dot" style="background:var(--cyan)"></div>
+        <div class="sprint-week-title">Text-First Daily Log System</div>
+        <div class="sprint-tasks">
+          <div class="task"><span class="task-icon">01</span>Build SMS/WhatsApp bot: foreman texts "J47 — 3 guys, 9 hrs, rough in 80% done, need 200A panel by Friday"</div>
+          <div class="task"><span class="task-icon">02</span>Claude API parses text → structured daily log (job ID, crew hours, progress %, material needs)</div>
+          <div class="task"><span class="task-icon">03</span>Auto-populate job cost spreadsheet with parsed data</div>
+          <div class="task"><span class="task-icon">04</span>Send foreman confirmation: "Logged: J47 — 27 crew-hours. Running total: 342 hrs of 410 budgeted (83%)"</div>
+        </div>
+      </div>
+
+      <div class="sprint-week" data-week="WK3">
+        <div class="sprint-dot" style="background:var(--cyan)"></div>
+        <div class="sprint-week-title">Variance Alert Engine</div>
+        <div class="sprint-tasks">
+          <div class="task"><span class="task-icon">01</span>Build alert logic: if hours-burned / % complete ratio exceeds bid by 15%, trigger alert</div>
+          <div class="task"><span class="task-icon">02</span>Owner gets daily SMS digest: "3 jobs on track, 1 alert: J47 tracking 12% over on labor"</div>
+          <div class="task"><span class="task-icon">03</span>Alert includes recommended action: "At current rate, J47 will exceed labor budget by $8,400"</div>
+          <div class="task"><span class="task-icon">04</span>Connect to existing payroll export for accurate labor cost data (avoid double-entry)</div>
+        </div>
+      </div>
+
+      <div class="sprint-week" data-week="WK4">
+        <div class="sprint-dot" style="background:var(--cyan)"></div>
+        <div class="sprint-week-title">Apprentice Hour Tracking Module</div>
+        <div class="sprint-tasks">
+          <div class="task"><span class="task-icon">01</span>Apprentices text daily hours to bot — auto-categorized by trade classification</div>
+          <div class="task"><span class="task-icon">02</span>Track cumulative hours by apprentice against JATC requirements (OJT hour tracking)</div>
+          <div class="task"><span class="task-icon">03</span>Weekly report to apprenticeship coordinator: hours logged, gaps vs. required, upcoming milestones</div>
+          <div class="task"><span class="task-icon">04</span>This module alone can justify the entire sprint cost — IBEW locals will pay for this separately</div>
+        </div>
+      </div>
+
+      <div class="sprint-week" data-week="WK5-6">
+        <div class="sprint-dot" style="background:var(--cyan)"></div>
+        <div class="sprint-week-title">Owner Dashboard + Handoff</div>
+        <div class="sprint-tasks">
+          <div class="task"><span class="task-icon">01</span>Build simple web dashboard (no app install required): all jobs, live status, variance flags</div>
+          <div class="task"><span class="task-icon">02</span>Generate weekly job cost report PDF automatically — eliminates owner's Sunday spreadsheet time</div>
+          <div class="task"><span class="task-icon">03</span>Measure time saved: admin hours per week, variance detection lag before vs. after</div>
+          <div class="task"><span class="task-icon">04</span>Document ROI + propose retained AI ops engagement at $4K/month</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout cyan">
+      <div class="callout-label">Sprint B Deliverable</div>
+      <p>Client gets: (1) SMS-based daily log system their foremen will actually use, (2) real-time variance alerts to the owner's phone, (3) JATC apprentice hour tracking. You get: daily active usage data, a high-retention case study, and proof of concept for Bet B platform.</p>
+    </div>
+  </div>
+
+  <!-- TOOL STACK -->
+  <div id="sprint-stack" class="inner-panel">
+    <div style="font-family:var(--mono);font-size:10px;color:var(--amber);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:20px;">Agency Tool Stack — No Custom Code Required for Sprints 1–3</div>
+
+    <div class="grid-2">
+      <div>
+        <div class="card card-accent-amber" style="margin-bottom:16px;">
+          <div class="card-label">AI Core</div>
+          <div class="card-title">Claude API (Anthropic)</div>
+          <p style="font-size:0.875rem;color:var(--text-dim);">Document intelligence, estimate drafting, natural language parsing from SMS/text, risk analysis generation. Use claude-sonnet for speed/cost balance in production.</p>
+          <div style="margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--text-muted);">~$0.003 per 1K tokens · Cost negligible vs. sprint price</div>
+        </div>
+        <div class="card card-accent-amber">
+          <div class="card-label">Automation Layer</div>
+          <div class="card-title">Make.com (formerly Integromat)</div>
+          <p style="font-size:0.875rem;color:var(--text-dim);">Connects SMS → Claude → Google Sheets → email alerts. No-code. Most sprint workflows are 10–20 node Make scenarios. Fast to build, easy to hand off.</p>
+          <div style="margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--text-muted);">$16–$30/month · Include in client's retainer</div>
+        </div>
+      </div>
+      <div>
+        <div class="card card-accent-cyan" style="margin-bottom:16px;">
+          <div class="card-label">SMS / Messaging</div>
+          <div class="card-title">Twilio or WhatsApp Business API</div>
+          <p style="font-size:0.875rem;color:var(--text-dim);">Foremen already live in their phones. No new app install = adoption. Twilio for programmatic SMS; WhatsApp Business API if the crew uses WhatsApp (common in construction).</p>
+          <div style="margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--text-muted);">$0.0075/SMS · ~$15/month per active job</div>
+        </div>
+        <div class="card card-accent-cyan">
+          <div class="card-label">Document Processing</div>
+          <div class="card-title">PDF Intelligence + Google Workspace</div>
+          <p style="font-size:0.875rem;color:var(--text-dim);">Claude processes PDFs natively. Output to Google Sheets for familiarity. Google Docs for change order templates. Most contractors already use Gmail — no new ecosystem to sell.</p>
+          <div style="margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--text-muted);">Client likely already pays for Workspace</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px; background:var(--bg3);">
+      <div class="card-label">When to Move to Custom Code</div>
+      <div class="card-title">Platform Trigger Signals</div>
+      <div class="grid-3" style="margin-top:16px;">
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--amber);letter-spacing:0.1em;margin-bottom:8px;">SIGNAL 1</div>
+          <p style="font-size:0.85rem;color:var(--text-dim);">You're rebuilding the same Make scenario from scratch for client #6</p>
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--amber);letter-spacing:0.1em;margin-bottom:8px;">SIGNAL 2</div>
+          <p style="font-size:0.85rem;color:var(--text-dim);">A client asks "can my other PM also use this?"</p>
+        </div>
+        <div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--amber);letter-spacing:0.1em;margin-bottom:8px;">SIGNAL 3</div>
+          <p style="font-size:0.85rem;color:var(--text-dim);">You have 3+ clients all hitting the same Make rate limits or workflow ceiling</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ BET A ═══════ -->
+<section id="bet-a" class="section">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div class="section-meta">
+      <div class="section-label">Phase 4 Platform · Bet A</div>
+      <div class="section-title">Estimating Intelligence Layer</div>
+      <div class="section-desc">An AI layer that augments existing estimating software rather than replacing it. Lower switching friction gets you in the door faster, but watch the retention dynamics carefully.</div>
+    </div>
+  </div>
+
+  <div class="bet-header">
+    <div class="bet-col">
+      <span class="bet-badge bet-badge-a">Bet A</span>
+      <div class="bet-name">The Intelligence<br>Layer</div>
+      <div class="bet-tagline">Sits on top of Accubid, ConEst, or any estimating tool via PDF/export integration</div>
+    </div>
+    <div class="bet-col" style="background:var(--bg3);">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:16px;">Core Value Propositions</div>
+      <div class="flow">
+        <div class="flow-item highlight">
+          <div class="flow-title">30–50% Faster Draft Estimates</div>
+          <div class="flow-desc">AI parses scope docs and generates first-draft count/hours, estimator reviews and adjusts</div>
+        </div>
+        <div class="flow-item highlight">
+          <div class="flow-title">Bid Risk Intelligence</div>
+          <div class="flow-desc">Flags ambiguous scope, material price volatility, and compares against historical win/loss patterns</div>
+        </div>
+        <div class="flow-item highlight">
+          <div class="flow-title">Institutional Knowledge Capture</div>
+          <div class="flow-desc">Estimator reasoning is logged — when they leave, their logic stays</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="inner-tabs">
+    <button class="inner-tab active" onclick="showInner('bet-a', 'a-arch')">Architecture</button>
+    <button class="inner-tab" onclick="showInner('bet-a', 'a-user')">User Flow</button>
+    <button class="inner-tab" onclick="showInner('bet-a', 'a-biz')">Business Model</button>
+  </div>
+
+  <!-- BET A ARCHITECTURE -->
+  <div id="a-arch" class="inner-panel active">
+    <div class="arch-diagram">
+      <div class="arch-layer">
+        <div class="arch-layer-label">INPUT LAYER — Documents & Data</div>
+        <div class="arch-row">
+          <div class="arch-node">PDF Spec Docs</div>
+          <div class="arch-node">Plan Sheets (PDF/DWG)</div>
+          <div class="arch-node">Scope of Work Text</div>
+          <div class="arch-node">Historical Job Cost CSV</div>
+          <div class="arch-node">Labor Rate Tables</div>
+          <div class="arch-node">Material Price Lists</div>
+        </div>
+      </div>
+
+      <div class="arch-connector">▼</div>
+
+      <div class="arch-layer">
+        <div class="arch-layer-label">INTELLIGENCE CORE — AI Processing</div>
+        <div class="arch-row">
+          <div class="arch-node amber">Document Parser<br><span style="font-size:9px;opacity:0.7">Claude API · PDF Vision</span></div>
+          <div class="arch-node amber">Scope Extractor<br><span style="font-size:9px;opacity:0.7">Electrical symbols, fixtures, circuits</span></div>
+          <div class="arch-node amber">Historical Retrieval<br><span style="font-size:9px;opacity:0.7">RAG on past job data</span></div>
+          <div class="arch-node amber">Risk Analyzer<br><span style="font-size:9px;opacity:0.7">Ambiguity + price flags</span></div>
+        </div>
+      </div>
+
+      <div class="arch-connector">▼</div>
+
+      <div class="arch-layer">
+        <div class="arch-layer-label">ESTIMATION ENGINE — Draft Generation</div>
+        <div class="arch-row">
+          <div class="arch-node cyan">Labor Hours Model<br><span style="font-size:9px;opacity:0.7">Units × historical hrs/unit</span></div>
+          <div class="arch-node cyan">Material BOM Builder<br><span style="font-size:9px;opacity:0.7">Auto-generated parts list</span></div>
+          <div class="arch-node cyan">Markup Calculator<br><span style="font-size:9px;opacity:0.7">Shop's margin rules</span></div>
+          <div class="arch-node cyan">Confidence Scorer<br><span style="font-size:9px;opacity:0.7">Flags uncertain line items</span></div>
+        </div>
+      </div>
+
+      <div class="arch-connector">▼</div>
+
+      <div class="arch-layer">
+        <div class="arch-layer-label">OUTPUT LAYER — Deliverables</div>
+        <div class="arch-row">
+          <div class="arch-node green">Draft Estimate<br><span style="font-size:9px;opacity:0.7">Excel / PDF format</span></div>
+          <div class="arch-node green">Bid Risk Brief<br><span style="font-size:9px;opacity:0.7">1-page summary</span></div>
+          <div class="arch-node green">Change Order Bot<br><span style="font-size:9px;opacity:0.7">SMS → formatted CO</span></div>
+          <div class="arch-node green">Win/Loss Analytics<br><span style="font-size:9px;opacity:0.7">Bid performance dashboard</span></div>
+        </div>
+      </div>
+
+      <div class="arch-connector">▼</div>
+
+      <div class="arch-layer">
+        <div class="arch-layer-label">INTEGRATION LAYER — Existing Software</div>
+        <div class="arch-row">
+          <div class="arch-node">Accubid / ConEst<br><span style="font-size:9px;opacity:0.7">Export/import sync</span></div>
+          <div class="arch-node">McCormick Systems<br><span style="font-size:9px;opacity:0.7">API or file sync</span></div>
+          <div class="arch-node">QuickBooks / Sage<br><span style="font-size:9px;opacity:0.7">Job cost pull</span></div>
+          <div class="arch-node">Google Workspace<br><span style="font-size:9px;opacity:0.7">Docs, Sheets, Gmail</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card card-accent-amber">
+        <div class="card-label">Technical Moat</div>
+        <div class="card-title">Historical Job Cost RAG</div>
+        <p style="font-size:0.875rem;color:var(--text-dim);">The more job history you ingest per client, the smarter their estimates get. This creates a compounding data moat — your AI gets better the longer they use it. Switching means losing that accumulated intelligence.</p>
+      </div>
+      <div class="card card-accent-amber">
+        <div class="card-label">Key Technical Risk</div>
+        <div class="card-title">PDF Plan Accuracy</div>
+        <p style="font-size:0.875rem;color:var(--text-dim);">Electrical plan sheets are complex. Count accuracy from PDFs will start at 70–80% and improve with fine-tuning. The MVP positions this as "AI assists, estimator approves" — not autonomous estimation.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- BET A USER FLOW -->
+  <div id="a-user" class="inner-panel">
+    <div style="font-family:var(--mono);font-size:10px;color:var(--amber);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:20px;">Estimator Daily Workflow</div>
+
+    <div class="flow">
+      <div class="flow-item highlight">
+        <div class="flow-title">1. Upload Bid Package</div>
+        <div class="flow-desc">Estimator drags PDFs into the platform (or emails them to a dedicated address). Takes 30 seconds.</div>
+      </div>
+      <div class="flow-arrow">↓ AI PROCESSING (2–5 MIN) ↓</div>
+      <div class="flow-item">
+        <div class="flow-title">2. Review AI-Extracted Scope</div>
+        <div class="flow-desc">Platform displays: panel schedules, circuit counts, fixture tallies, conduit runs — all extracted and organized. Estimator clicks to verify or correct each line. Corrections train the model.</div>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-item">
+        <div class="flow-title">3. Review Draft Labor & Material Estimate</div>
+        <div class="flow-desc">AI suggests labor hours per trade phase based on historical data from similar jobs. Material BOM auto-generated from scope. Estimator adjusts where needed — most items require no change.</div>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-item highlight">
+        <div class="flow-title">4. Read Bid Risk Brief</div>
+        <div class="flow-desc">Before submitting, estimator reviews: scope ambiguities flagged, material price alerts (if wire prices jumped 8% this week), comparison to last 5 similar-size won/lost bids.</div>
+      </div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-item">
+        <div class="flow-title">5. Export Final Bid</div>
+        <div class="flow-desc">Export to Excel, PDF, or push directly to Accubid/ConEst. Final bid is documented with AI reasoning — when owner asks "why did we price it this way," the answer is in the system.</div>
+      </div>
+      <div class="flow-arrow">↓ JOB AWARDED ↓</div>
+      <div class="flow-item highlight">
+        <div class="flow-title">6. Change Order Capture (During Job)</div>
+        <div class="flow-desc">Foreman texts scope changes → AI generates formatted change order in 2 minutes → PM reviews and sends to GC. Every CO is logged against the original bid automatically.</div>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:24px;">
+      <div class="callout-label">Why Estimators Will Love This</div>
+      <p>You're not replacing their judgment — you're eliminating the mechanical work they hate. The creative, strategic part of estimating (pricing for risk, reading the GC relationship, knowing when to sharpen the pencil) stays with the estimator. You're just removing the 4 hours of counting receptacles from blueprints.</p>
+    </div>
+  </div>
+
+  <!-- BET A BUSINESS MODEL -->
+  <div id="a-biz" class="inner-panel">
+    <div class="grid-3" style="margin-bottom:24px;">
+      <div class="card card-accent-amber">
+        <div class="card-label">Starter Tier</div>
+        <div class="card-title" style="font-size:1.5rem;">$499<span style="font-size:0.9rem;font-weight:400;">/mo</span></div>
+        <ul class="signal-list">
+          <li>Up to 3 users</li>
+          <li>50 bids/month</li>
+          <li>Estimating assistant</li>
+          <li>Bid risk brief</li>
+          <li>Export to Excel/PDF</li>
+        </ul>
+      </div>
+      <div class="card card-accent-amber">
+        <div class="card-label">Growth Tier</div>
+        <div class="card-title" style="font-size:1.5rem;">$1,200<span style="font-size:0.9rem;font-weight:400;">/mo</span></div>
+        <ul class="signal-list">
+          <li>Up to 15 users</li>
+          <li>Unlimited bids</li>
+          <li>Estimating + CO bot</li>
+          <li>Accubid/ConEst integration</li>
+          <li>Win/loss analytics</li>
+          <li>Historical job cost RAG</li>
+        </ul>
+      </div>
+      <div class="card card-accent-amber">
+        <div class="card-label">Enterprise Tier</div>
+        <div class="card-title" style="font-size:1.5rem;">Custom</div>
+        <ul class="signal-list">
+          <li>Multi-branch / multi-company</li>
+          <li>API access</li>
+          <li>White-label for NECA chapters</li>
+          <li>Custom model fine-tuning</li>
+          <li>Dedicated success manager</li>
+        </ul>
+      </div>
+    </div>
+
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Dimension</th>
+          <th>Assessment</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Sales Cycle</td>
+          <td class="win">Short — 2–4 weeks. Buyer is the estimator or ops manager, not a committee. Pain is immediate and quantifiable.</td>
+        </tr>
+        <tr>
+          <td>Switching Cost (to Adopt)</td>
+          <td class="win">Low — doesn't replace existing tools, just adds a layer. No retraining, no workflow overhaul.</td>
+        </tr>
+        <tr>
+          <td>Switching Cost (to Leave)</td>
+          <td class="neutral">Medium — historical job cost data and trained model create lock-in, but the core workflow survives without it.</td>
+        </tr>
+        <tr>
+          <td>Expansion Revenue</td>
+          <td class="neutral">Moderate — add branches, users. Limited "land and expand" beyond estimating department.</td>
+        </tr>
+        <tr>
+          <td>Defensibility</td>
+          <td class="neutral">Medium — any well-funded competitor can build the same AI layer. Your moat is proprietary job cost data + distribution.</td>
+        </tr>
+        <tr>
+          <td>Market Size</td>
+          <td class="win">$2.4B estimating software market in construction. Electrical-specific = smaller but less competitive.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════ BET B ═══════ -->
+<section id="bet-b" class="section">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div class="section-meta">
+      <div class="section-label">Phase 4 Platform · Bet B</div>
+      <div class="section-title">Field Intelligence Hub</div>
+      <div class="section-desc">A mobile-first OS for the job site — replacing disconnected spreadsheets and text threads with a real-time intelligence layer for foremen, PMs, and owners. Harder to adopt, nearly impossible to leave.</div>
+    </div>
+  </div>
+
+  <div class="bet-header">
+    <div class="bet-col">
+      <span class="bet-badge bet-badge-b">Bet B</span>
+      <div class="bet-name">The Field<br>Intelligence Hub</div>
+      <div class="bet-tagline">Mobile-first OS for job sites — foremen log via SMS, owners see everything in real time</div>
+    </div>
+    <div class="bet-col" style="background:var(--bg3);">
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:16px;">Core Value Propositions</div>
+      <div class="flow">
+        <div class="flow-item highlight-cyan">
+          <div class="flow-title">Real-Time Labor Variance Detection</div>
+          <div class="flow-desc">Owner knows about overruns in days, not weeks. Every alert is an intervention opportunity.</div>
+        </div>
+        <div class="flow-item highlight-cyan">
+          <div class="flow-title">Zero-Friction Field Logging</div>
+          <div class="flow-desc">Foremen text naturally — no app install, no new login, no training required</div>
+        </div>
+        <div class="flow-item highlight-cyan">
+          <div class="flow-title">JATC Apprentice Hour Compliance</div>
+          <div class="flow-desc">Automatic OJT tracking that IBEW locals will pay for independently</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="inner-tabs">
+    <button class="inner-tab active" onclick="showInner('bet-b', 'b-arch')">Architecture</button>
+    <button class="inner-tab" onclick="showInner('bet-b', 'b-user')">User Flows</button>
+    <button class="inner-tab" onclick="showInner('bet-b', 'b-biz')">Business Model</button>
+  </div>
+
+  <!-- BET B ARCHITECTURE -->
+  <div id="b-arch" class="inner-panel active">
+    <div class="arch-diagram">
+      <div class="arch-layer">
+        <div class="arch-layer-label">FIELD INPUT LAYER — Zero-Friction Data Capture</div>
+        <div class="arch-row">
+          <div class="arch-node">Foreman SMS/WhatsApp<br><span style="font-size:9px;opacity:0.7">Natural language daily log</span></div>
+          <div class="arch-node">Apprentice SMS Log<br><span style="font-size:9px;opacity:0.7">Hours + task classification</span></div>
+          <div class="arch-node">Photo Upload via Text<br><span style="font-size:9px;opacity:0.7">Inspection photos, work proof</span></div>
+          <div class="arch-node">Material Request Bot<br><span style="font-size:9px;opacity:0.7">"Need 200A panel by Fri"</span></div>
+        </div>
+      </div>
+
+      <div class="arch-connector">▼</div>
+
+      <div class="arch-layer">
+        <div class="arch-layer-label">AI PARSING ENGINE</div>
+        <div class="arch-row">
+          <div class="arch-node cyan">NLP Text Parser<br><span style="font-size:9px;opacity:0.7">Claude API · Job ID, crew, hours, progress</span></div>
+          <div class="arch-node cyan">Intent Classifier<br><span style="font-size:9px;opacity:0.7">Daily log vs. alert vs. material request</span></div>
+          <div class="arch-node cyan">Photo Analyzer<br><span style="font-size:9px;opacity:0.7">Claude Vision · tag and catalog</span></div>
+          <div class="arch-node cyan">Entity Extractor<br><span style="font-size:9px;opacity:0.7">Map to job IDs, crew members</span></div>
+        </div>
+      </div>
+
+      <div class="arch-connector">▼</div>
+
+      <div class="arch-layer">
+        <div class="arch-layer-label">INTELLIGENCE CORE — Real-Time Analysis</div>
+        <div class="arch-row">
+          <div class="arch-node amber">Variance Engine<br><span style="font-size:9px;opacity:0.7">Actual hrs vs. bid hrs/progress</span></div>
+          <div class="arch-node amber">Forecast Model<br><span style="font-size:9px;opacity:0.7">Project final cost at completion</span></div>
+          <div class="arch-node amber">Ratio Monitor<br><span style="font-size:9px;opacity:0.7">Journeyman/Apprentice ratio</span></div>
+          <div class="arch-node amber">JATC Tracker<br><span style="font-size:9px;opacity:0.7">OJT hours vs. requirements</span></div>
+        </div>
+      </div>
+
+      <div class="arch-connector">▼</div>
+
+      <div class="arch-layer">
+        <div class="arch-layer-label">ALERT & REPORTING LAYER</div>
+        <div class="arch-row">
+          <div class="arch-node green">Owner SMS Digest<br><span style="font-size:9px;opacity:0.7">Daily portfolio status</span></div>
+          <div class="arch-node green">Variance Alert<br><span style="font-size:9px;opacity:0.7">Threshold-triggered intervention</span></div>
+          <div class="arch-node green">Weekly PDF Report<br><span style="font-size:9px;opacity:0.7">Auto-generated job cost summary</span></div>
+          <div class="arch-node green">JATC Report<br><span style="font-size:9px;opacity:0.7">Monthly apprentice hour compliance</span></div>
+        </div>
+      </div>
+
+      <div class="arch-connector">▼</div>
+
+      <div class="arch-layer">
+        <div class="arch-layer-label">OWNER / PM WEB DASHBOARD</div>
+        <div class="arch-row">
+          <div class="arch-node">Job Portfolio View<br><span style="font-size:9px;opacity:0.7">All active jobs, live status</span></div>
+          <div class="arch-node">Job Drilldown<br><span style="font-size:9px;opacity:0.7">Hour logs, photos, materials</span></div>
+          <div class="arch-node">Crew Management<br><span style="font-size:9px;opacity:0.7">Schedules, certifications</span></div>
+          <div class="arch-node">Payroll Export<br><span style="font-size:9px;opacity:0.7">QuickBooks / ADP integration</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card card-accent-cyan">
+        <div class="card-label">Technical Moat</div>
+        <div class="card-title">The Operational Data Layer</div>
+        <p style="font-size:0.875rem;color:var(--text-dim);">Daily logs, crew hours, job photos, apprentice records — this becomes the most complete operational data asset a contractor has ever had. Replacing the platform means losing years of records. No contractor will do that.</p>
+      </div>
+      <div class="card card-accent-cyan">
+        <div class="card-label">Key Technical Risk</div>
+        <div class="card-title">Foreman Behavior Change</div>
+        <p style="font-size:0.875rem;color:var(--text-dim);">Even SMS-based logging requires a habit change. The MVP must be so obviously easy that foremen adopt without being told twice. Failure mode: owner pays, crew ignores it. Solution: co-design the UX with 3 foremen before launch.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- BET B USER FLOWS -->
+  <div id="b-user" class="inner-panel">
+    <div class="grid-2">
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--cyan);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:16px;">Foreman Daily Flow</div>
+        <div class="flow">
+          <div class="flow-item highlight-cyan">
+            <div class="flow-title">End of Day Text</div>
+            <div class="flow-desc">"J47 — me + 2 guys, 9 hrs each. Rough in done. Need 3 panels Mon." Sent from the parking lot in 20 seconds.</div>
+          </div>
+          <div class="flow-arrow">↓ AI PARSES IN &lt;5 SECONDS ↓</div>
+          <div class="flow-item">
+            <div class="flow-title">Confirmation Reply</div>
+            <div class="flow-desc">Bot texts back: "Logged: J47 — 27hrs. Total: 342/410 budget (83%). Material request queued for Monday." Foreman knows it worked.</div>
+          </div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-item">
+            <div class="flow-title">Weekly Summary (Optional)</div>
+            <div class="flow-desc">Every Friday, foreman receives their week's summary. Useful for disputes, timesheet verification, and performance reviews.</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--cyan);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:16px;">Owner Morning Flow</div>
+        <div class="flow">
+          <div class="flow-item highlight-cyan">
+            <div class="flow-title">7 AM SMS Digest</div>
+            <div class="flow-desc">"Portfolio: 4 jobs active. 3 on track ✓. 1 alert: J47 tracking 14% over on labor. Tap to see details."</div>
+          </div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-item">
+            <div class="flow-title">Dashboard Review (2 min)</div>
+            <div class="flow-desc">Opens web dashboard on phone. J47 shows: projected overrun of $8,400 at current burn rate. AI recommends: "Review scope for missed change orders or discuss productivity with foreman."</div>
+          </div>
+          <div class="flow-arrow">↓</div>
+          <div class="flow-item highlight-cyan">
+            <div class="flow-title">Action: Call Foreman</div>
+            <div class="flow-desc">Owner calls the foreman Monday morning instead of discovering the overrun at closeout. That call saves $8,400.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:32px;">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--cyan);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:16px;">Apprentice / JATC Flow (Bonus Module)</div>
+      <div class="flow" style="max-width:600px;">
+        <div class="flow-item">
+          <div class="flow-title">Apprentice Daily Text</div>
+          <div class="flow-desc">"J47 — 9hrs conduit bending + panel wiring" → System logs under JATC work classification codes automatically</div>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-item highlight-cyan">
+          <div class="flow-title">Monthly JATC Report (Auto-Generated)</div>
+          <div class="flow-desc">PDF report: each apprentice's hours by category vs. program requirements. One click, replaces a foreman's entire Friday afternoon of paperwork.</div>
+        </div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-item">
+          <div class="flow-title">IBEW Local Office Integration</div>
+          <div class="flow-desc">Sell directly to IBEW locals as a compliance tool. One local = 200+ apprentices = enterprise contract. This vertical within the vertical is worth pursuing standalone.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BET B BUSINESS MODEL -->
+  <div id="b-biz" class="inner-panel">
+    <div class="grid-3" style="margin-bottom:24px;">
+      <div class="card card-accent-cyan">
+        <div class="card-label">Starter Tier</div>
+        <div class="card-title" style="font-size:1.5rem;">$399<span style="font-size:0.9rem;font-weight:400;">/mo</span></div>
+        <ul class="signal-list">
+          <li>Up to 5 active jobs</li>
+          <li>Up to 10 field users</li>
+          <li>SMS daily logging</li>
+          <li>Variance alerts</li>
+          <li>Weekly PDF report</li>
+        </ul>
+      </div>
+      <div class="card card-accent-cyan">
+        <div class="card-label">Growth Tier</div>
+        <div class="card-title" style="font-size:1.5rem;">$1,100<span style="font-size:0.9rem;font-weight:400;">/mo</span></div>
+        <ul class="signal-list">
+          <li>Unlimited jobs + users</li>
+          <li>JATC apprentice module</li>
+          <li>Payroll export integration</li>
+          <li>Photo documentation</li>
+          <li>Material request tracking</li>
+          <li>QuickBooks integration</li>
+        </ul>
+      </div>
+      <div class="card card-accent-cyan">
+        <div class="card-label">IBEW Local / Enterprise</div>
+        <div class="card-title" style="font-size:1.5rem;">Custom</div>
+        <ul class="signal-list">
+          <li>Multi-contractor management</li>
+          <li>JATC program administration</li>
+          <li>Compliance reporting portal</li>
+          <li>API for payroll systems</li>
+          <li>Branded portal for locals</li>
+        </ul>
+      </div>
+    </div>
+
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Dimension</th>
+          <th>Assessment</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Sales Cycle</td>
+          <td class="neutral">Longer — 4–8 weeks. Requires owner buy-in AND crew participation. Needs a champion on the job site.</td>
+        </tr>
+        <tr>
+          <td>Switching Cost (to Adopt)</td>
+          <td class="neutral">Medium — SMS logging is frictionless, but getting the whole crew to change habits takes 2–3 weeks</td>
+        </tr>
+        <tr>
+          <td>Switching Cost (to Leave)</td>
+          <td class="win">Very High — years of job logs, crew history, apprentice records, and photos are all inside. No one leaves.</td>
+        </tr>
+        <tr>
+          <td>Expansion Revenue</td>
+          <td class="win">Strong — per-user pricing, add apprentice module, add JATC local contract. Every new crew member = revenue.</td>
+        </tr>
+        <tr>
+          <td>Defensibility</td>
+          <td class="win">High — operational data moat + JATC module creates a relationship with the union that competitors can't easily replicate.</td>
+        </tr>
+        <tr>
+          <td>Market Size</td>
+          <td class="neutral">Slightly smaller than Bet A's estimating market, but nearly zero direct competition. You would be category-creating.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout cyan" style="margin-top:8px;">
+      <div class="callout-label">The IBEW Local Wildcard</div>
+      <p>If you can sell one IBEW local on the apprentice tracking module, they may mandate its use for all signatory contractors in their jurisdiction. That's 50–200 contractors becoming users in a single deal — without any of them going through a standard sales cycle. Bet B's enterprise channel is potentially explosive.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ VERDICT ═══════ -->
+<section id="verdict" class="section">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div class="section-meta">
+      <div class="section-label">Decision Framework</div>
+      <div class="section-title">Which Bet to Make</div>
+      <div class="section-desc">The agency phase generates the data that answers this question. Here's how to read the signals and when to commit.</div>
+    </div>
+  </div>
+
+  <table class="compare-table" style="margin-bottom:40px;">
+    <thead>
+      <tr>
+        <th>Factor</th>
+        <th>Bet A — Estimating Layer</th>
+        <th>Bet B — Field Hub</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Time to First Dollar</td>
+        <td class="win">Faster — estimators are immediate champions</td>
+        <td class="neutral">Slower — requires crew adoption</td>
+      </tr>
+      <tr>
+        <td>Retention (NRR)</td>
+        <td class="neutral">~110–120% expected</td>
+        <td class="win">~130–150% expected</td>
+      </tr>
+      <tr>
+        <td>Build Complexity</td>
+        <td class="win">Lower — AI + export integrations</td>
+        <td class="neutral">Higher — mobile UX + real-time processing</td>
+      </tr>
+      <tr>
+        <td>Competition</td>
+        <td class="neutral">Moderate — other AI estimating startups emerging</td>
+        <td class="win">Low — field ops for electrical is uncontested</td>
+      </tr>
+      <tr>
+        <td>Your Unfair Advantage</td>
+        <td class="neutral">Domain knowledge of estimating (strong)</td>
+        <td class="win">Apprentice background = foremen trust you (unique)</td>
+      </tr>
+      <tr>
+        <td>Acquisition Channel</td>
+        <td class="neutral">Estimators / NECA events</td>
+        <td class="win">IBEW locals = distribution multiplier</td>
+      </tr>
+      <tr>
+        <td>Exit Multiple</td>
+        <td class="neutral">3–5x ARR (AI SaaS, horizontal market)</td>
+        <td class="win">5–8x ARR (vertical SaaS, strong retention, union data)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="font-family:var(--mono);font-size:10px;color:var(--amber);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:20px;">Signal Triggers — What Your Agency Clients Will Tell You</div>
+
+  <div class="grid-2" style="margin-bottom:40px;">
+    <div class="card card-accent-amber">
+      <div class="card-label">Signals That Favor Bet A</div>
+      <div class="card-title">Go Estimating Layer</div>
+      <ul class="signal-list">
+        <li class="green">Estimator retention is the #1 pain mentioned unprompted</li>
+        <li class="green">Multiple owners say "I'd pay $X to have a backup estimator"</li>
+        <li class="green">Sprint A clients are using the tool daily without being pushed</li>
+        <li class="green">You win clients faster and they ask for more estimating features</li>
+        <li>You're struggling to get foremen to adopt Sprint B's SMS logging</li>
+      </ul>
+    </div>
+    <div class="card card-accent-cyan">
+      <div class="card-label">Signals That Favor Bet B</div>
+      <div class="card-title">Go Field Hub</div>
+      <ul class="signal-list">
+        <li class="green">Foremen adopt SMS logging within 3 days without being told twice</li>
+        <li class="green">An owner says "I'd never go back to not having this" within 30 days</li>
+        <li class="green">A JATC coordinator or IBEW local expresses interest in the apprentice module</li>
+        <li class="green">Sprint B clients are expanding — adding more jobs and crew members</li>
+        <li>Sprint A clients keep asking for field reporting functionality</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="verdict-box">
+    <div class="verdict-header">Strategic Recommendation — Based on Your Profile</div>
+    <div class="verdict-body">
+      <div class="verdict-item amber">
+        <div class="verdict-label">Near-Term (Months 3–8): Run Both Sprints</div>
+        <div class="verdict-desc">Run Sprint A for 3 clients and Sprint B for 3 clients concurrently. Both are sellable now. The data from these 6 engagements will be worth more than any amount of strategic planning in telling you which platform to build.</div>
+      </div>
+      <div class="verdict-item cyan">
+        <div class="verdict-label">Platform Bet (Month 12): Lean Toward Bet B</div>
+        <div class="verdict-desc">Your background as an electrician gives you a credibility edge with foremen and IBEW that no tech founder can replicate. Bet B's IBEW distribution channel and high retention profile match your long-term advantage better — but only if field adoption proves out in the agency phase.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout" style="margin-top:24px;">
+    <div class="callout-label">The Combination Play (Year 2)</div>
+    <p>The ideal end state is a unified platform: field intelligence (Bet B) feeds historical actuals into the estimating engine (Bet A). Real job cost data makes estimates sharper. Sharper estimates make the field variance alerts more meaningful. That flywheel is defensible in a way neither product alone can achieve — and it's a story you can tell to investors.</p>
+  </div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-left">ELECTRICAL TRADES AI · GTM PLAYBOOK v1.0</div>
+  <div class="footer-right">APPRENTICE → ENTERPRISE → FOUNDER</div>
+</footer>
+
+<script>
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const tabs = document.querySelectorAll('.nav-tab');
+  const sectionOrder = ['overview', 'script', 'sprint', 'bet-a', 'bet-b', 'verdict'];
+  const idx = sectionOrder.indexOf(id);
+  if (tabs[idx]) tabs[idx].classList.add('active');
+}
+
+function showInner(sectionId, panelId) {
+  const section = document.getElementById(sectionId);
+  section.querySelectorAll('.inner-panel').forEach(p => p.classList.remove('active'));
+  section.querySelectorAll('.inner-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(panelId).classList.add('active');
+  const tabs = section.querySelectorAll('.inner-tab');
+  const panels = section.querySelectorAll('.inner-panel');
+  panels.forEach((p, i) => {
+    if (p.id === panelId && tabs[i]) tabs[i].classList.add('active');
+  });
+}
+</script>
+</body>
+</html>
