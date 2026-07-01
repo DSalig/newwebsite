@@ -1,41 +1,76 @@
 /* ============================================================
-   PRESSD — storefront logic
+   PRESSD — retail storefront logic
    Vanilla JS, no build step. Handles: product grid + filtering,
-   cart (persisted), studio customizer, drop countdown,
-   scroll reveals, count-up stats, toasts.
+   product quick-view (size/color/qty), cart (persisted),
+   drop countdown, scroll reveals, count-up stats, toasts.
    ============================================================ */
 (function () {
   'use strict';
 
-  /* ---------- catalog ---------- */
-  // POD streetwear line. `art` is a CSS-rendered graphic so the demo
-  // needs no image assets and stays fully self-contained.
+  /* ---------- catalog ----------
+     A finished-goods retail line: clothing + accessories.
+     `art` renders a CSS graphic so the demo needs no image assets.
+     `colors` = purchasable colorways; `sizes` = null for one-size accessories. */
+  const APPAREL = ['S', 'M', 'L', 'XL', '2XL'];
   const PRODUCTS = [
     { id: 'p1', name: 'Concrete Bloom Tee', cat: 'tops', category: 'Heavyweight tee', price: 42, size: 'lg', tag: 'new',
-      art: { bg: 'linear-gradient(135deg,#1a1a1a,#2a2a2a)', fg: '#c8ff00', text: 'CONCRETE\nBLOOM', fs: '3.4rem' } },
-    { id: 'p2', name: 'Transit Map Hoodie', cat: 'fleece', category: 'Heavyweight hoodie', price: 74, size: 'std', tag: 'hot',
-      art: { bg: 'linear-gradient(135deg,#141414,#1e1e1e)', fg: '#ff5a36', text: 'LINE\n06', fs: '2.6rem' } },
+      desc: 'Hand-drawn florals breaking through the pavement, screen-quality print on a 240gsm boxy-fit tee.',
+      colors: [['Asphalt','#1a1a1a','#c8ff00'], ['Bone','#f4f1ea','#1a1a1a'], ['Flare','#ff5a36','#0a0a0a']],
+      sizes: APPAREL, art: { bg: 'linear-gradient(135deg,#1a1a1a,#2a2a2a)', fg: '#c8ff00', text: 'CONCRETE\nBLOOM', fs: '3.4rem' } },
+    { id: 'p2', name: 'Transit Line Hoodie', cat: 'fleece', category: 'Heavyweight hoodie', price: 74, size: 'std', tag: 'hot',
+      desc: 'Brushed-back 400gsm fleece with a metro-line graphic. Double-lined hood, ribbed cuffs.',
+      colors: [['Asphalt','#141414','#ff5a36'], ['Cobalt','#3d5afe','#f4f1ea']],
+      sizes: APPAREL, art: { bg: 'linear-gradient(135deg,#141414,#1e1e1e)', fg: '#ff5a36', text: 'LINE\n06', fs: '2.6rem' } },
     { id: 'p3', name: 'Nightshift Cap', cat: 'headwear', category: '6-panel cap', price: 32, size: 'std',
-      art: { bg: 'linear-gradient(135deg,#0f0f1e,#1a1a3a)', fg: '#3d5afe', text: 'NIGHT\nSHIFT', fs: '1.9rem' } },
-    { id: 'p4', name: 'Static Signal Tee', cat: 'tops', category: 'Boxy fit tee', price: 40, size: 'std',
-      art: { bg: 'linear-gradient(135deg,#1c1c1c,#111)', fg: '#f4f1ea', text: 'NO\nSIGNAL', fs: '2.4rem' } },
-    { id: 'p5', name: 'Rooftop Riso Print', cat: 'print', category: 'A2 wall print', price: 28, size: 'std',
-      art: { bg: 'linear-gradient(135deg,#ff5a36,#c8ff00)', fg: '#0a0a0a', text: 'ROOF\nTOP', fs: '2.4rem' } },
+      desc: 'Structured 6-panel with a curved brim and embroidered mark. Adjustable strap, one size.',
+      colors: [['Midnight','#0f0f1e','#3d5afe'], ['Asphalt','#1a1a1a','#c8ff00']],
+      sizes: null, art: { bg: 'linear-gradient(135deg,#0f0f1e,#1a1a3a)', fg: '#3d5afe', text: 'NIGHT\nSHIFT', fs: '1.9rem' } },
+    { id: 'p4', name: 'No Signal Tee', cat: 'tops', category: 'Boxy fit tee', price: 40, size: 'std',
+      desc: 'Static-glitch chest print on a heavyweight boxy tee with drop shoulders.',
+      colors: [['Ink','#1c1c1c','#f4f1ea'], ['Bone','#f4f1ea','#1c1c1c']],
+      sizes: APPAREL, art: { bg: 'linear-gradient(135deg,#1c1c1c,#111)', fg: '#f4f1ea', text: 'NO\nSIGNAL', fs: '2.4rem' } },
+    { id: 'p5', name: 'Rooftop Riso Print', cat: 'accessories', category: 'A2 wall print', price: 28, size: 'std',
+      desc: 'Two-tone riso-style giclée print, A2, shipped rolled in a rigid tube. Frame not included.',
+      colors: [['Sunset','linear-gradient(135deg,#ff5a36,#c8ff00)','#0a0a0a']],
+      sizes: null, art: { bg: 'linear-gradient(135deg,#ff5a36,#c8ff00)', fg: '#0a0a0a', text: 'ROOF\nTOP', fs: '2.4rem' } },
     { id: 'p6', name: 'Overpass Zip Hoodie', cat: 'fleece', category: 'Full-zip fleece', price: 82, size: 'wide',
-      art: { bg: 'linear-gradient(135deg,#161616,#242424)', fg: '#c8ff00', text: 'OVERPASS', fs: '2.2rem' } },
-    { id: 'p7', name: 'Grid Tote', cat: 'print', category: 'Canvas carry-all', price: 26, size: 'std',
-      art: { bg: 'linear-gradient(135deg,#f4f1ea,#d8d5cc)', fg: '#0a0a0a', text: 'CARRY\nTHE\nGRID', fs: '1.7rem' } },
+      desc: 'Full-zip heavyweight fleece with tonal back print and YKK hardware.',
+      colors: [['Asphalt','#161616','#c8ff00'], ['Bone','#e6e2d8','#161616']],
+      sizes: APPAREL, art: { bg: 'linear-gradient(135deg,#161616,#242424)', fg: '#c8ff00', text: 'OVERPASS', fs: '2.2rem' } },
+    { id: 'p7', name: 'Carry The Grid Tote', cat: 'accessories', category: 'Canvas tote', price: 26, size: 'std',
+      desc: '16oz natural canvas tote with reinforced straps and an internal pocket.',
+      colors: [['Natural','#f4f1ea','#0a0a0a']],
+      sizes: null, art: { bg: 'linear-gradient(135deg,#f4f1ea,#d8d5cc)', fg: '#0a0a0a', text: 'CARRY\nTHE\nGRID', fs: '1.7rem' } },
     { id: 'p8', name: 'Beacon Beanie', cat: 'headwear', category: 'Ribbed beanie', price: 30, size: 'std',
-      art: { bg: 'linear-gradient(135deg,#1a1a1a,#111)', fg: '#ff5a36', text: 'BEACON', fs: '1.7rem' } },
+      desc: 'Chunky ribbed cuffed beanie in soft acrylic with a woven tab.',
+      colors: [['Asphalt','#1a1a1a','#ff5a36'], ['Acid','#c8ff00','#111111']],
+      sizes: null, art: { bg: 'linear-gradient(135deg,#1a1a1a,#111)', fg: '#ff5a36', text: 'BEACON', fs: '1.7rem' } },
+    { id: 'p9', name: 'Static Crewneck', cat: 'fleece', category: 'Heavyweight crew', price: 68, size: 'std', tag: 'new',
+      desc: 'Mid-weight loopback crewneck with tonal embroidery. Relaxed fit.',
+      colors: [['Bone','#e6e2d8','#1a1a1a'], ['Asphalt','#161616','#c8ff00']],
+      sizes: APPAREL, art: { bg: 'linear-gradient(135deg,#20201c,#2c2c26)', fg: '#e6e2d8', text: 'STATIC', fs: '2rem' } },
+    { id: 'p10', name: 'Block Party Socks', cat: 'accessories', category: 'Ribbed crew socks', price: 14, size: 'std',
+      desc: 'Cushioned combed-cotton crew socks with a jacquard cuff. One pair, one size.',
+      colors: [['Acid','#c8ff00','#111111'], ['Flare','#ff5a36','#0a0a0a']],
+      sizes: null, art: { bg: 'linear-gradient(135deg,#c8ff00,#9ecc00)', fg: '#111111', text: 'BLOCK\nPARTY', fs: '1.5rem' } },
+    { id: 'p11', name: 'Grid Phone Case', cat: 'accessories', category: 'Impact phone case', price: 24, size: 'std',
+      desc: 'Slim impact-absorbing case with a matte grid print. Multiple models at checkout.',
+      colors: [['Ink','#141414','#3d5afe']],
+      sizes: null, art: { bg: 'linear-gradient(135deg,#141414,#222)', fg: '#3d5afe', text: 'GRID', fs: '1.8rem' } },
+    { id: 'p12', name: 'Skyline Longsleeve', cat: 'tops', category: 'Long-sleeve tee', price: 48, size: 'std',
+      desc: 'Heavyweight long-sleeve with sleeve-runner print and a ribbed collar.',
+      colors: [['Asphalt','#1a1a1a','#f4f1ea'], ['Cobalt','#26306a','#c8ff00']],
+      sizes: APPAREL, art: { bg: 'linear-gradient(135deg,#1a1a1a,#232323)', fg: '#f4f1ea', text: 'SKY\nLINE', fs: '2.2rem' } },
   ];
 
-  const SIZES = ['S', 'M', 'L', 'XL'];
   const fmt = (n) => '$' + n.toFixed(2);
+  const FREE_SHIP = 75;
   const $ = (s, r) => (r || document).querySelector(s);
   const $$ = (s, r) => Array.prototype.slice.call((r || document).querySelectorAll(s));
+  const byId = (id) => PRODUCTS.find(function (p) { return p.id === id; });
 
   /* ---------- state ---------- */
-  const STORE_KEY = 'pressd_cart_v1';
+  const STORE_KEY = 'pressd_cart_v2';
   let cart = load();
 
   function load() {
@@ -52,16 +87,17 @@
   function cardMarkup(p) {
     const sizeClass = p.size === 'lg' ? ' card--lg' : p.size === 'wide' ? ' card--wide' : '';
     const tagMarkup = p.tag
-      ? '<span class="card__tag card__tag--' + p.tag + '">' + (p.tag === 'hot' ? 'Selling fast' : 'New drop') + '</span>'
+      ? '<span class="card__tag card__tag--' + p.tag + '">' + (p.tag === 'hot' ? 'Selling fast' : 'New in') + '</span>'
       : '';
     const glyphFs = p.size === 'lg' ? p.art.fs : '';
     return (
-      '<article class="card' + sizeClass + '" data-cat="' + p.cat + '" data-id="' + p.id + '">' +
+      '<article class="card' + sizeClass + '" data-cat="' + p.cat + '" data-id="' + p.id + '" tabindex="0" role="button" aria-label="' + p.name + ', ' + fmt(p.price) + '. View details">' +
         tagMarkup +
         '<div class="card__art" style="background:' + p.art.bg + '">' +
           '<div class="glyph" style="color:' + p.art.fg + (glyphFs ? ';font-size:' + glyphFs : '') + '">' +
             p.art.text.replace(/\n/g, '<br>') +
           '</div>' +
+          '<span class="card__quick">Quick view</span>' +
         '</div>' +
         '<div class="card__body">' +
           '<div class="card__meta">' +
@@ -69,7 +105,7 @@
             '<div class="card__cat">' + p.category + '</div></div>' +
             '<div class="card__price">' + fmt(p.price) + '</div>' +
           '</div>' +
-          '<button class="card__add" data-add="' + p.id + '">Add to bag</button>' +
+          '<button class="card__add" data-add="' + p.id + '">' + (p.sizes ? 'Select options' : 'Add to bag') + '</button>' +
         '</div>' +
       '</article>'
     );
@@ -77,9 +113,8 @@
 
   function renderGrid() {
     grid.innerHTML = PRODUCTS.map(cardMarkup).join('');
-    // stagger the reveal
     $$('.card', grid).forEach(function (c, i) {
-      setTimeout(function () { c.classList.add('in'); }, 60 * i);
+      setTimeout(function () { c.classList.add('in'); }, 50 * i);
     });
   }
 
@@ -103,15 +138,119 @@
     });
   }
 
+  /* ---------- quick view ---------- */
+  const qv = $('#qv');
+  const qvOverlay = $('#qvOverlay');
+  const qvState = { product: null, color: 0, size: null, qty: 1 };
+
+  function openQuickView(p) {
+    qvState.product = p;
+    qvState.color = 0;
+    qvState.size = p.sizes ? null : 'One size';
+    qvState.qty = 1;
+
+    $('#qvCat').textContent = p.category;
+    $('#qvName').textContent = p.name;
+    $('#qvPrice').textContent = fmt(p.price);
+    $('#qvDesc').textContent = p.desc;
+
+    // colors
+    $('#qvColors').innerHTML = p.colors.map(function (c, i) {
+      return '<button class="' + (i === 0 ? 'is-active' : '') + '" style="--sw:' + c[1] + '" data-ci="' + i + '" aria-label="' + c[0] + '"></button>';
+    }).join('');
+    $('#qvColorLabel').textContent = 'Colorway · ' + p.colors[0][0];
+
+    // sizes
+    const sizeField = $('#qvSizeField');
+    if (p.sizes) {
+      sizeField.style.display = '';
+      $('#qvSizes').innerHTML = p.sizes.map(function (s) {
+        return '<button data-size="' + s + '">' + s + '</button>';
+      }).join('');
+    } else {
+      sizeField.style.display = 'none';
+    }
+
+    $('#qvQty').textContent = '1';
+    updateQvArt();
+    updateQvAddState();
+
+    qv.classList.add('open');
+    qvOverlay.classList.add('open');
+    qv.setAttribute('aria-hidden', 'false');
+  }
+
+  function updateQvArt() {
+    const p = qvState.product;
+    const art = $('#qvArt');
+    art.style.background = p.art.bg;
+    art.innerHTML = '<div class="glyph" style="color:' + p.art.fg + '">' + p.art.text.replace(/\n/g, '<br>') + '</div>';
+  }
+
+  function updateQvAddState() {
+    const p = qvState.product;
+    const needsSize = !!p.sizes && !qvState.size;
+    const btn = $('#qvAdd');
+    btn.disabled = needsSize;
+    btn.classList.toggle('is-disabled', needsSize);
+    $('#qvAddPrice').textContent = needsSize ? 'select a size' : fmt(p.price * qvState.qty);
+  }
+
+  function closeQuickView() {
+    qv.classList.remove('open');
+    qvOverlay.classList.remove('open');
+    qv.setAttribute('aria-hidden', 'true');
+  }
+
+  function bindQuickView() {
+    $('#qvClose').addEventListener('click', closeQuickView);
+    qvOverlay.addEventListener('click', closeQuickView);
+
+    $('#qvColors').addEventListener('click', function (e) {
+      const b = e.target.closest('button'); if (!b) return;
+      $$('#qvColors button').forEach(function (x) { x.classList.remove('is-active'); });
+      b.classList.add('is-active');
+      qvState.color = parseInt(b.dataset.ci, 10);
+      $('#qvColorLabel').textContent = 'Colorway · ' + qvState.product.colors[qvState.color][0];
+    });
+
+    $('#qvSizes').addEventListener('click', function (e) {
+      const b = e.target.closest('button'); if (!b) return;
+      $$('#qvSizes button').forEach(function (x) { x.classList.remove('is-active'); });
+      b.classList.add('is-active');
+      qvState.size = b.dataset.size;
+      updateQvAddState();
+    });
+
+    $('#qvInc').addEventListener('click', function () { qvState.qty++; $('#qvQty').textContent = qvState.qty; updateQvAddState(); });
+    $('#qvDec').addEventListener('click', function () { if (qvState.qty > 1) { qvState.qty--; $('#qvQty').textContent = qvState.qty; updateQvAddState(); } });
+
+    $('#qvAdd').addEventListener('click', function () {
+      const p = qvState.product;
+      if (p.sizes && !qvState.size) return;
+      const color = p.colors[qvState.color];
+      const opt = color[0] + (qvState.size ? ' · ' + qvState.size : '');
+      addToCart({
+        key: p.id + ':' + color[0] + ':' + (qvState.size || 'os'),
+        name: p.name,
+        opt: opt,
+        price: p.price,
+        art: { bg: p.art.bg, fg: p.art.fg, label: p.art.text.split('\n')[0] }
+      }, qvState.qty);
+      closeQuickView();
+      openCart();
+    });
+  }
+
   /* ---------- cart ---------- */
   const cartEl = $('#cart');
   const overlay = $('#drawerOverlay');
 
-  function addToCart(item) {
-    // item: {key, name, opt, price, art}
+  function addToCart(item, qty) {
+    qty = qty || 1;
     const existing = cart.find(function (c) { return c.key === item.key; });
-    if (existing) existing.qty += 1;
-    else cart.push(Object.assign({ qty: 1 }, item));
+    if (existing) existing.qty += qty;
+    else cart.push(Object.assign({ qty: qty }, item));
     save();
     renderCart();
     bumpCount();
@@ -184,6 +323,12 @@
     }).join('');
 
     $('#cartSubtotal').textContent = fmt(subtotal());
+
+    // free-shipping progress nudge
+    const remain = FREE_SHIP - subtotal();
+    const fs = $('#cartFreeShip');
+    if (remain > 0) fs.innerHTML = '<span>Add ' + fmt(remain) + ' for free shipping</span>';
+    else fs.innerHTML = '<span>◆ You unlocked free shipping</span>';
   }
 
   function openCart() { cartEl.classList.add('open'); overlay.classList.add('open'); cartEl.setAttribute('aria-hidden', 'false'); }
@@ -193,24 +338,39 @@
     $('#cartBtn').addEventListener('click', openCart);
     $('#cartClose').addEventListener('click', closeCart);
     overlay.addEventListener('click', closeCart);
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeCart(); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { closeCart(); closeQuickView(); }
+    });
 
-    // catalog "add" clicks (delegated)
+    // card interactions (delegated): "add" button vs. card body → quick view
     grid.addEventListener('click', function (e) {
-      const btn = e.target.closest('[data-add]');
-      if (!btn) return;
-      const p = PRODUCTS.find(function (x) { return x.id === btn.dataset.add; });
-      if (!p) return;
-      const size = SIZES[Math.floor(SIZES.length / 2)]; // default M/L
-      addToCart({
-        key: p.id + ':' + size,
-        name: p.name,
-        opt: p.category + ' · ' + size,
-        price: p.price,
-        art: { bg: p.art.bg, fg: p.art.fg, label: p.art.text.split('\n')[0] }
-      });
-      btn.textContent = 'Added ✓';
-      setTimeout(function () { btn.textContent = 'Add to bag'; }, 1100);
+      const addBtn = e.target.closest('[data-add]');
+      if (addBtn) {
+        e.stopPropagation();
+        const p = byId(addBtn.dataset.add);
+        if (!p) return;
+        if (p.sizes) { openQuickView(p); return; } // apparel needs a size
+        // one-size accessory: add default color straight to cart
+        const color = p.colors[0];
+        addToCart({
+          key: p.id + ':' + color[0] + ':os',
+          name: p.name, opt: color[0],
+          price: p.price,
+          art: { bg: p.art.bg, fg: p.art.fg, label: p.art.text.split('\n')[0] }
+        });
+        addBtn.textContent = 'Added ✓';
+        setTimeout(function () { addBtn.textContent = 'Add to bag'; }, 1100);
+        return;
+      }
+      const card = e.target.closest('.card');
+      if (card) { const p = byId(card.dataset.id); if (p) openQuickView(p); }
+    });
+
+    // keyboard: Enter/Space on a focused card opens quick view
+    grid.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const card = e.target.closest('.card');
+      if (card) { e.preventDefault(); const p = byId(card.dataset.id); if (p) openQuickView(p); }
     });
 
     // cart qty / remove (delegated)
@@ -229,87 +389,8 @@
     });
   }
 
-  /* ---------- studio customizer ---------- */
-  function bindStudio() {
-    const teeBody = $('#teeBody');
-    const teePrint = $('#teePrint');
-    const priceEl = $('#studioPrice');
-    const studioPriceBig = $('#studioPrice');
-
-    const state = {
-      garment: 'Tee',
-      price: 38,
-      color: '#111111',
-      colorName: 'Asphalt',
-      ink: '#f4f1ea',
-      text: 'CITY PRESSD',
-      font: 'mono'
-    };
-
-    function paint() {
-      teeBody.style.setProperty('--tee', state.color);
-      teePrint.style.color = state.ink;
-      teePrint.textContent = state.text || 'YOUR TEXT';
-      priceEl.textContent = fmt(state.price);
-      // legible ink on light garment
-      const light = ['#f4f1ea'].indexOf(state.color) > -1;
-      if (light && state.ink === '#f4f1ea') teePrint.style.color = '#111';
-    }
-
-    // garment
-    $('#garmentSeg').addEventListener('click', function (e) {
-      const b = e.target.closest('button'); if (!b) return;
-      $$('#garmentSeg button').forEach(function (x) { x.classList.remove('is-active'); });
-      b.classList.add('is-active');
-      state.garment = b.dataset.garment;
-      state.price = parseInt(b.dataset.price, 10);
-      paint();
-    });
-
-    // colorway
-    $('#swatches').addEventListener('click', function (e) {
-      const b = e.target.closest('button'); if (!b) return;
-      $$('#swatches button').forEach(function (x) { x.classList.remove('is-active'); });
-      b.classList.add('is-active');
-      state.color = b.dataset.color;
-      state.colorName = b.dataset.name;
-      paint();
-    });
-
-    // ink
-    $('#inkSeg').addEventListener('click', function (e) {
-      const b = e.target.closest('button'); if (!b) return;
-      $$('#inkSeg button').forEach(function (x) { x.classList.remove('is-active'); });
-      b.classList.add('is-active');
-      state.ink = b.dataset.ink;
-      paint();
-    });
-
-    // text
-    $('#graphicInput').addEventListener('input', function (e) {
-      state.text = e.target.value.toUpperCase();
-      paint();
-    });
-
-    // add build to cart
-    $('#studioAdd').addEventListener('click', function () {
-      const label = (state.text || 'CUSTOM').split(' ')[0];
-      addToCart({
-        key: 'custom:' + state.garment + ':' + state.color + ':' + state.ink + ':' + state.text,
-        name: 'Custom ' + state.garment,
-        opt: state.colorName + ' · "' + (state.text || 'blank') + '"',
-        price: state.price,
-        art: { bg: state.color, fg: state.ink, label: label.slice(0, 5) }
-      });
-      openCart();
-    });
-
-    paint();
-  }
-
   /* ---------- drop countdown ---------- */
   function bindCountdown() {
-    // next Friday 18:00 local
     function nextDrop() {
       const now = new Date('2026-07-01T12:00:00'); // deterministic seed for demo
       const d = new Date(now);
@@ -320,20 +401,18 @@
       d.setHours(18, 0, 0, 0);
       return d;
     }
-    let target = nextDrop();
-    let base = new Date('2026-07-01T12:00:00').getTime();
+    const target = nextDrop();
+    const base = new Date('2026-07-01T12:00:00').getTime();
     const start = performance.now();
 
     function tick() {
-      // advance a synthetic clock from the seed so the timer visibly runs
       const elapsed = performance.now() - start;
       const nowMs = base + elapsed;
-      let diff = Math.max(0, target.getTime() - nowMs);
-      const days = Math.floor(diff / 864e5);
-      const hours = Math.floor((diff % 864e5) / 36e5);
-      const mins = Math.floor((diff % 36e5) / 6e4);
-      const secs = Math.floor((diff % 6e4) / 1e3);
-      set('days', days); set('hours', hours); set('mins', mins); set('secs', secs);
+      const diff = Math.max(0, target.getTime() - nowMs);
+      set('days', Math.floor(diff / 864e5));
+      set('hours', Math.floor((diff % 864e5) / 36e5));
+      set('mins', Math.floor((diff % 36e5) / 6e4));
+      set('secs', Math.floor((diff % 6e4) / 1e3));
     }
     function set(k, v) {
       const el = $('[data-cd="' + k + '"]');
@@ -378,29 +457,24 @@
 
   /* ---------- misc UI ---------- */
   function bindMisc() {
-    // sticky header shadow
     const header = $('#header');
     window.addEventListener('scroll', function () {
       header.classList.toggle('is-stuck', window.scrollY > 20);
     }, { passive: true });
 
-    // cursor glow
     const glow = $('.cursor-glow');
     window.addEventListener('pointermove', function (e) {
       glow.style.left = e.clientX + 'px';
       glow.style.top = e.clientY + 'px';
     }, { passive: true });
 
-    // newsletter
     $('#signup').addEventListener('submit', function (e) {
       e.preventDefault();
-      const note = $('#signupNote');
-      note.textContent = "You're on the list — check your inbox for the next drop.";
+      $('#signupNote').textContent = "You're on the list — check your inbox for 10% off.";
       e.target.reset();
     });
 
-    // search + menu (demo affordances)
-    $('#searchBtn').addEventListener('click', function () { toast('Search coming to the next drop'); });
+    $('#searchBtn').addEventListener('click', function () { toast('Search coming soon'); });
     $('#menuToggle').addEventListener('click', function () {
       document.querySelector('#shop').scrollIntoView({ behavior: 'smooth' });
     });
@@ -420,8 +494,8 @@
   document.addEventListener('DOMContentLoaded', function () {
     renderGrid();
     bindFilters();
+    bindQuickView();
     bindCart();
-    bindStudio();
     bindCountdown();
     countUp();
     reveals();
