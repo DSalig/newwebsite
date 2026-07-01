@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="description" content="PRESSD — print-on-demand streetwear for the city. Design it, we press it, you wear it. Zero waste, zero inventory, all attitude.">
+<title>PRESSD — Print. Wear. Repeat.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+<div class="cursor-glow" aria-hidden="true"></div>
+
+<!-- Announcement / drop bar -->
+<div class="dropbar" id="dropbar">
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track">
+      <span>◆ FREE SHIPPING OVER $75</span><span>◆ NEXT DROP FRIDAY 6PM</span><span>◆ PRINTED ON DEMAND · ZERO WASTE</span><span>◆ MADE WHEN YOU ORDER</span><span>◆ FREE SHIPPING OVER $75</span><span>◆ NEXT DROP FRIDAY 6PM</span><span>◆ PRINTED ON DEMAND · ZERO WASTE</span><span>◆ MADE WHEN YOU ORDER</span>
+    </div>
+  </div>
+</div>
+
+<!-- Header -->
+<header class="header" id="header">
+  <div class="container header__inner">
+    <a href="#top" class="brand" aria-label="PRESSD home">
+      <span class="brand__mark">▚</span>PRESSD
+    </a>
+    <nav class="nav" aria-label="Primary">
+      <a href="#shop">Shop</a>
+      <a href="#studio">Studio</a>
+      <a href="#drops">Drops</a>
+      <a href="#how">How it works</a>
+    </nav>
+    <div class="header__actions">
+      <button class="icon-btn" id="searchBtn" aria-label="Search">⌕</button>
+      <button class="icon-btn cart-btn" id="cartBtn" aria-label="Open cart">
+        <span class="cart-icon">▣</span>
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
+      <button class="icon-btn menu-toggle" id="menuToggle" aria-label="Menu">≡</button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero__bg" aria-hidden="true">
+      <div class="blob blob--1"></div>
+      <div class="blob blob--2"></div>
+      <div class="blob blob--3"></div>
+    </div>
+    <div class="container hero__inner">
+      <p class="hero__eyebrow" data-reveal>◆ Print-on-demand streetwear · Est. City 2026</p>
+      <h1 class="hero__title">
+        <span class="line" data-reveal><span>PRINT.</span></span>
+        <span class="line" data-reveal><span class="stroke">WEAR.</span></span>
+        <span class="line" data-reveal><span>REPEAT.</span></span>
+      </h1>
+      <p class="hero__sub" data-reveal>
+        Concrete-born graphics pressed the moment you hit checkout. No warehouses,
+        no dead stock, no compromise — just your fit, made to order and shipped from the block.
+      </p>
+      <div class="hero__cta" data-reveal>
+        <a href="#shop" class="btn btn--solid">Shop the grid</a>
+        <a href="#studio" class="btn btn--ghost">Design your own →</a>
+      </div>
+      <div class="hero__stats" data-reveal>
+        <div><strong data-count="0" data-to="48">0</strong><span>hrs to your door</span></div>
+        <div><strong data-count="0" data-to="100">0</strong><span>% made on demand</span></div>
+        <div><strong data-count="0" data-to="0" data-suffix="∞">0</strong><span>colorways</span></div>
+      </div>
+    </div>
+    <div class="hero__scroll" aria-hidden="true">scroll ↓</div>
+  </section>
+
+  <!-- Trust strip -->
+  <section class="logos" aria-label="As featured in">
+    <div class="container logos__row">
+      <span>FADER</span><span>HYPEBEAST</span><span>COMPLEX</span><span>DAZED</span><span>i-D</span><span>HIGHSNOBIETY</span>
+    </div>
+  </section>
+
+  <!-- Shop / Bento grid -->
+  <section id="shop" class="shop section">
+    <div class="container">
+      <div class="section__head">
+        <div>
+          <p class="kicker">◆ The grid</p>
+          <h2 class="section__title">Fresh off the press</h2>
+        </div>
+        <div class="filters" id="filters" role="tablist" aria-label="Product categories">
+          <button class="chip is-active" data-filter="all" role="tab" aria-selected="true">All</button>
+          <button class="chip" data-filter="tops" role="tab" aria-selected="false">Tops</button>
+          <button class="chip" data-filter="fleece" role="tab" aria-selected="false">Fleece</button>
+          <button class="chip" data-filter="headwear" role="tab" aria-selected="false">Headwear</button>
+          <button class="chip" data-filter="print" role="tab" aria-selected="false">Wall + Carry</button>
+        </div>
+      </div>
+      <div class="bento" id="productGrid" aria-live="polite"><!-- injected by app.js --></div>
+    </div>
+  </section>
+
+  <!-- Studio / customizer -->
+  <section id="studio" class="studio section">
+    <div class="container studio__grid">
+      <div class="studio__copy">
+        <p class="kicker">◆ The studio</p>
+        <h2 class="section__title">Press it your way</h2>
+        <p class="studio__lead">
+          You're the art director. Pick the blank, drop your graphic zone, choose the ink —
+          we render a live preview and press it fresh. Every order is a one-off.
+        </p>
+        <ul class="studio__list">
+          <li><span>01</span> Choose garment + colorway</li>
+          <li><span>02</span> Load a graphic or type your slogan</li>
+          <li><span>03</span> We print &amp; ship within 48h</li>
+        </ul>
+        <div class="studio__price">
+          <span>Your build</span>
+          <strong id="studioPrice">$38.00</strong>
+        </div>
+        <button class="btn btn--solid" id="studioAdd">Add build to cart</button>
+      </div>
+
+      <div class="studio__stage">
+        <div class="tee" id="teePreview">
+          <div class="tee__body" id="teeBody">
+            <div class="tee__print" id="teePrint" data-font="mono">CITY<br>PRESSD</div>
+          </div>
+        </div>
+        <div class="studio__controls">
+          <div class="ctrl">
+            <label>Garment</label>
+            <div class="seg" id="garmentSeg">
+              <button data-garment="Tee" data-price="38" class="is-active">Tee</button>
+              <button data-garment="Heavy Tee" data-price="46">Heavy</button>
+              <button data-garment="Hoodie" data-price="72">Hoodie</button>
+            </div>
+          </div>
+          <div class="ctrl">
+            <label>Colorway</label>
+            <div class="swatches" id="swatches">
+              <button style="--sw:#111111" data-color="#111111" data-name="Asphalt" class="is-active" aria-label="Asphalt"></button>
+              <button style="--sw:#f4f1ea" data-color="#f4f1ea" data-name="Bone" aria-label="Bone"></button>
+              <button style="--sw:#c8ff00" data-color="#c8ff00" data-name="Acid" aria-label="Acid"></button>
+              <button style="--sw:#ff5a36" data-color="#ff5a36" data-name="Flare" aria-label="Flare"></button>
+              <button style="--sw:#3d5afe" data-color="#3d5afe" data-name="Cobalt" aria-label="Cobalt"></button>
+            </div>
+          </div>
+          <div class="ctrl">
+            <label>Graphic text</label>
+            <input type="text" id="graphicInput" maxlength="18" value="CITY PRESSD" aria-label="Graphic text">
+          </div>
+          <div class="ctrl">
+            <label>Ink</label>
+            <div class="seg" id="inkSeg">
+              <button data-ink="#f4f1ea" class="is-active">Bone</button>
+              <button data-ink="#c8ff00">Acid</button>
+              <button data-ink="#ff5a36">Flare</button>
+              <button data-ink="#111111">Ink</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Drop countdown -->
+  <section id="drops" class="drop section">
+    <div class="container drop__inner">
+      <div class="drop__meta">
+        <p class="kicker">◆ Next drop</p>
+        <h2 class="section__title">VOL.06 — CONCRETE BLOOM</h2>
+        <p class="drop__desc">Twelve pieces. Hand-drawn florals fighting through the pavement. Printed to order the second the timer hits zero.</p>
+        <a href="#shop" class="btn btn--ghost">Set a reminder →</a>
+      </div>
+      <div class="countdown" id="countdown" role="timer" aria-live="off">
+        <div class="cd"><strong data-cd="days">00</strong><span>days</span></div>
+        <div class="cd"><strong data-cd="hours">00</strong><span>hrs</span></div>
+        <div class="cd"><strong data-cd="mins">00</strong><span>min</span></div>
+        <div class="cd"><strong data-cd="secs">00</strong><span>sec</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section id="how" class="how section">
+    <div class="container">
+      <p class="kicker">◆ How it works</p>
+      <h2 class="section__title">Made when you order. Never before.</h2>
+      <div class="steps">
+        <article class="step" data-reveal>
+          <span class="step__no">01</span>
+          <h3>You cop it</h3>
+          <p>Pick a piece off the grid or build your own in the studio. Nothing exists yet — that's the point.</p>
+        </article>
+        <article class="step" data-reveal>
+          <span class="step__no">02</span>
+          <h3>We press it</h3>
+          <p>Your order routes to the nearest print house. Fresh ink on demand means zero landfill overstock.</p>
+        </article>
+        <article class="step" data-reveal>
+          <span class="step__no">03</span>
+          <h3>You rock it</h3>
+          <p>Boxed and shipped within 48 hours, carbon-offset to your door. One of one, every time.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter -->
+  <section class="cta-band">
+    <div class="container cta-band__inner">
+      <h2>Get on the list.<br><span class="stroke">Skip the resale.</span></h2>
+      <form class="signup" id="signup">
+        <input type="email" placeholder="you@thecity.com" aria-label="Email address" required>
+        <button class="btn btn--solid" type="submit">Notify me</button>
+      </form>
+      <p class="cta-band__note" id="signupNote">Early access to every drop. No spam, ever.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container footer__grid">
+    <div class="footer__brand">
+      <a href="#top" class="brand"><span class="brand__mark">▚</span>PRESSD</a>
+      <p>Print-on-demand streetwear for people who move different. Made on demand in the city, for the city.</p>
+    </div>
+    <div class="footer__col">
+      <h4>Shop</h4>
+      <a href="#shop">New arrivals</a><a href="#shop">Tops</a><a href="#shop">Fleece</a><a href="#shop">Headwear</a>
+    </div>
+    <div class="footer__col">
+      <h4>Studio</h4>
+      <a href="#studio">Custom builder</a><a href="#drops">Drops</a><a href="#how">How it works</a>
+    </div>
+    <div class="footer__col">
+      <h4>Support</h4>
+      <a href="#">Shipping</a><a href="#">Returns</a><a href="#">Size guide</a><a href="#">Contact</a>
+    </div>
+  </div>
+  <div class="container footer__base">
+    <span>© 2026 PRESSD. Pressed with intent.</span>
+    <div class="footer__social"><a href="#">IG</a><a href="#">TT</a><a href="#">X</a></div>
+  </div>
+</footer>
+
+<!-- Cart drawer -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<aside class="cart" id="cart" aria-label="Shopping cart" aria-hidden="true">
+  <div class="cart__head">
+    <h3>Your bag <span id="cartHeadCount">(0)</span></h3>
+    <button class="icon-btn" id="cartClose" aria-label="Close cart">✕</button>
+  </div>
+  <div class="cart__items" id="cartItems"></div>
+  <div class="cart__empty" id="cartEmpty">
+    <p>Bag's empty.</p>
+    <span>Go press something.</span>
+  </div>
+  <div class="cart__foot" id="cartFoot" hidden>
+    <div class="cart__row"><span>Subtotal</span><strong id="cartSubtotal">$0.00</strong></div>
+    <div class="cart__row cart__row--muted"><span>Shipping</span><span id="cartShip">Calculated at checkout</span></div>
+    <button class="btn btn--solid btn--full" id="checkoutBtn">Checkout</button>
+    <p class="cart__note">Every item is printed to order — final sale on customs.</p>
+  </div>
+</aside>
+
+<!-- Toast -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
