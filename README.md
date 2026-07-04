@@ -5,6 +5,11 @@ installations, vintage lighting rehabilitation, rare chandelier repair, and
 turnkey LED retrofit programs — with an AI Lighting Studio that turns a photo
 of any space into a personalized, three-layer lighting plan.
 
+Site copy is written for an **honest new-venture launch** — capability and
+promise claims only, no fabricated track record. Business identity (name,
+contact inboxes, footer credentials) lives in `lib/site.ts`; update it to
+match reality before going live.
+
 Built with **Next.js 15 + TypeScript**, **Supabase** (catalog, leads, order
 requests, AI consultations), and **Claude vision** for the photo-to-plan
 studio. Designed on 2026 UX patterns: a dark, light-native aesthetic,

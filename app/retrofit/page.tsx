@@ -95,7 +95,8 @@ export default function RetrofitPage() {
             <Reveal delay={140}>
               <p className="lede">
                 Drag the sliders to your building. Estimates use conservative
-                equipment and labor figures from our recent projects.
+                industry equipment and labor figures — your proposal replaces
+                them with metered numbers.
               </p>
             </Reveal>
           </div>

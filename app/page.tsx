@@ -29,7 +29,7 @@ export default function HomePage() {
         />
         <div className="container" style={{ position: "relative" }}>
           <Reveal>
-            <span className="eyebrow">The Light Atelier · Est. on four decades of craft</span>
+            <span className="eyebrow">The Light Atelier · Custom light · Restoration · LED retrofit</span>
           </Reveal>
           <Reveal delay={100}>
             <h1 className="h-hero" style={{ marginTop: 22, maxWidth: "14ch" }}>
@@ -74,20 +74,20 @@ export default function HomePage() {
           <Reveal>
             <div className="stat-row">
               <div className="stat">
-                <b>40+</b>
-                <span>years of combined industry craft</span>
+                <b>100%</b>
+                <span>made to order — no warehouse, no compromises</span>
               </div>
               <div className="stat">
-                <b>1,200+</b>
-                <span>fixtures restored, retrofitted or built</span>
-              </div>
-              <div className="stat">
-                <b>62%</b>
-                <span>average energy reduction after LED conversion</span>
+                <b>50–70%</b>
+                <span>typical energy cut when converting to LED (industry range)</span>
               </div>
               <div className="stat">
                 <b>5 yrs</b>
                 <span>of included service on every turnkey project</span>
+              </div>
+              <div className="stat">
+                <b>2200K</b>
+                <span>candle-warm dimming as our house standard</span>
               </div>
             </div>
           </Reveal>
@@ -298,17 +298,18 @@ export default function HomePage() {
         <div className="container grid-2" style={{ alignItems: "center", gap: 56 }}>
           <Reveal>
             <p className="big-quote">
-              “They lit our lobby with a chandelier from 1908 and cut our
-              energy bill by half in the same project. Nobody else does both.”
+              One studio that can hang a 1908 chandelier and halve the energy
+              bill in the same project — that&apos;s the niche we&apos;re
+              building.
             </p>
           </Reveal>
           <Reveal delay={120}>
             <div>
               <p style={{ color: "var(--text-dim)", marginBottom: 22 }}>
-                Long-standing relationships with architects, designers,
-                developers, contractors, and end users — built on technical
-                expertise, design excellence, and showing up for year five the
-                way we showed up on day one.
+                Built for architects, designers, developers, contractors, and
+                end users. We win the second project by how we handle the
+                first — technical rigor, design excellence, and showing up for
+                year five the way we showed up on day one.
               </p>
               <Link href="/trade" className="btn btn-ghost">
                 Partner with the atelier →

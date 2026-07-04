@@ -80,7 +80,7 @@ export const CATEGORIES: Category[] = [
     name: "Vintage & Restored",
     short: "Vintage",
     description:
-      "One-of-a-kind antique fixtures rescued, rewired to modern code, and relamped with warm-dim LED. Provenance documented on every piece.",
+      "One-of-a-kind antique fixtures rescued, rewired to modern code, and relamped with warm-dim LED — provenance documented on every piece. Listings shown are representative of our restoration bench; one-of-one availability rotates and is confirmed at consultation.",
   },
   {
     slug: "retrofit-kits",
@@ -94,7 +94,7 @@ export const CATEGORIES: Category[] = [
     name: "Vela Series — Proprietary LED",
     short: "Vela Series",
     description:
-      "Our proprietary architectural LED line, born from an unmet need inside our own projects and validated across our portfolio. Spec-grade output, designer-grade finish.",
+      "Our proprietary architectural LED line, born from an unmet need inside our own projects — every piece proven on our installs before it's offered for spec. Spec-grade output, designer-grade finish.",
   },
 ];
 
@@ -170,7 +170,7 @@ export const PRODUCTS: Product[] = [
     blurb:
       "Organic cast-bronze branch chandelier with frosted bud diffusers — a sculptural centerpiece for lodge, restaurant, or great-room ceilings.",
     description:
-      "Branchwork Noir is cast in sections from sculpted bronze branches, then assembled and balanced for your room. Frosted glass buds carry high-CRI LED at 2400K. Because the piece is modular, we can shape it long and low over a table, or full and radial for a rotunda. A favorite of our hospitality clients.",
+      "Branchwork Noir is cast in sections from sculpted bronze branches, then assembled and balanced for your room. Frosted glass buds carry high-CRI LED at 2400K. Because the piece is modular, we can shape it long and low over a table, or full and radial for a rotunda — a natural fit for lodges, restaurants, and great rooms.",
     specs: {
       Span: "36–120″ configurable",
       Output: "4,200–9,600 lm",
@@ -254,7 +254,7 @@ export const PRODUCTS: Product[] = [
     price: 640,
     priceNote: "each — multi-drop discounts apply",
     blurb:
-      "Hand-blown amber globe on a fabric-wrapped cord, glowing like a held ember. Our most-specified kitchen pendant.",
+      "Hand-blown amber globe on a fabric-wrapped cord, glowing like a held ember. The kitchen pendant we design the rest of the room around.",
     description:
       "The Ember Globe is a single hand-blown sphere in amber, smoke, or opal glass, suspended on color-matched fabric cord. The integral LED module is hidden in the neck, so the glass reads as pure light. Order singly or as staggered clusters of three, five, or seven with a shared canopy.",
     specs: {
@@ -452,7 +452,7 @@ export const PRODUCTS: Product[] = [
     blurb:
       "A single ribbon of brushed brass folded into a wave, washing the wall above and below with grazing light.",
     description:
-      "Ribbon Wave folds one continuous sheet of brass into a soft S-curve that conceals up- and down-firing LED channels. The grazing light picks up wall texture beautifully — plaster, limewash, and brick clients love it. Dual channels dim independently.",
+      "Ribbon Wave folds one continuous sheet of brass into a soft S-curve that conceals up- and down-firing LED channels. The grazing light picks up wall texture beautifully — made for plaster, limewash, and brick. Dual channels dim independently.",
     specs: {
       Width: '5" — height 14"',
       Output: "900 lm (dual channel)",
@@ -505,7 +505,7 @@ export const PRODUCTS: Product[] = [
     price: 210,
     priceNote: "each — sold in runs",
     blurb:
-      "Recessed step and corridor light with a shielded, zero-glare aperture. The quiet workhorse of hospitality corridors.",
+      "Recessed step and corridor light with a shielded, zero-glare aperture. Built to be the quiet workhorse of hospitality corridors.",
     description:
       "Alcove Glow tucks into stud walls and stair stringers, throwing a low shielded wash across treads and floors. At 1% dim it becomes a night-path system. Specified by the run — we supply engraved circuiting diagrams with every order.",
     specs: {
@@ -672,7 +672,7 @@ export const PRODUCTS: Product[] = [
     blurb:
       "Drop-in LED conversion for 2×4 fluorescent troffers: 15 minutes per fixture, ballast eliminated, 62% energy reduction.",
     description:
-      "The workhorse of our commercial conversions. TrofferRelight replaces fluorescent tubes and ballast with a magnetic-mount LED panel and flicker-free driver — no fixture replacement, no ceiling work. Typical office sees 62% energy reduction with better light quality and zero ballast maintenance. DLC Premium listed, so it qualifies for utility rebates that we file on your behalf under the turnkey program.",
+      "The workhorse of commercial conversions. TrofferRelight replaces fluorescent tubes and ballast with a magnetic-mount LED panel and flicker-free driver — no fixture replacement, no ceiling work. Typical office sees 62% energy reduction with better light quality and zero ballast maintenance. DLC Premium listed, so it qualifies for utility rebates that we file on your behalf under the turnkey program.",
     specs: {
       "Fits": "standard 2×4 troffers (2×2 kit available)",
       Output: "4,000–5,000 lm selectable",
@@ -728,7 +728,7 @@ export const PRODUCTS: Product[] = [
     blurb:
       "Candelabra LED lamps that dim from 2700K to 1800K ember — the only retrofit lamp we trust inside restored chandeliers.",
     description:
-      "Most LED candle lamps ruin antique fixtures — wrong color, visible diodes, buzzy dimming. Ours were developed for our own restoration shop: a spiral filament in hand-tinted glass, 95 CRI, and a true warm-dim curve calibrated against gas flame. Flicker-free on the dimmers we specify, and we test compatibility with yours before shipping.",
+      "Most LED candle lamps ruin antique fixtures — wrong color, visible diodes, buzzy dimming. These are the lamps our restoration bench specifies: a spiral filament in hand-tinted glass, 95 CRI, and a true warm-dim curve calibrated against gas flame. Flicker-free on the dimmers we specify, and we test compatibility with yours before shipping.",
     specs: {
       Base: "E12 candelabra / E26 adapter",
       Output: "350 lm each",
@@ -813,7 +813,7 @@ export const PRODUCTS: Product[] = [
     blurb:
       "Our flagship plaster-in linear channel: a seamless line of dot-free light, born from a detail our own projects demanded.",
     description:
-      "Vela Linea exists because no channel on the market gave us a truly seamless, dot-free line at warm color temperatures with a plaster-in edge we trusted. So we engineered our own. Cut to the millimeter, mitered corners welded light-tight, and driven by remote drivers we mount where they can be serviced. Validated across four years of our own installs before we offered it for spec.",
+      "Vela Linea exists because no channel on the market gave us a truly seamless, dot-free line at warm color temperatures with a plaster-in edge we trusted. So we engineered our own with our manufacturing partner. Cut to the millimeter, mitered corners welded light-tight, and driven by remote drivers we mount where they can be serviced. Proven on our own installs before it's offered for spec.",
     specs: {
       Profile: 'plaster-in, 0.9" aperture',
       Output: "300–900 lm/ft",
@@ -841,7 +841,7 @@ export const PRODUCTS: Product[] = [
     blurb:
       "A 2″ trimless downlight with the deepest regress in its class — you see light, never the source.",
     description:
-      "Punto was designed for our hospitality ceilings, where glare control is everything. A 2-inch aperture with 45° cutoff and a regressed optic means guests see pools of light on tables, never a bright hole in the ceiling. Mud-in trimless or flanged, wet-rated for showers and eaves.",
+      "Punto was designed for hospitality ceilings, where glare control is everything. A 2-inch aperture with 45° cutoff and a regressed optic means guests see pools of light on tables, never a bright hole in the ceiling. Mud-in trimless or flanged, wet-rated for showers and eaves.",
     specs: {
       Aperture: '2" trimless or flanged',
       Output: "800 lm",
@@ -869,7 +869,7 @@ export const PRODUCTS: Product[] = [
     blurb:
       "Asymmetric cove optic that throws light deep across a ceiling plane from a shallow 1.5″ pocket.",
     description:
-      "Standard cove strips waste half their light inside the pocket. Arco's asymmetric lens pushes the beam out and across, evenly washing ceilings up to 16 feet deep from a pocket just 1.5 inches tall. The detail that makes our floating-ceiling installs look like they're lit from nowhere.",
+      "Standard cove strips waste half their light inside the pocket. Arco's asymmetric lens pushes the beam out and across, evenly washing ceilings up to 16 feet deep from a pocket just 1.5 inches tall. The detail that makes a floating ceiling look lit from nowhere.",
     specs: {
       Pocket: '1.5" minimum height',
       Throw: "up to 16 ft even wash",
@@ -896,7 +896,7 @@ export const PRODUCTS: Product[] = [
     blurb:
       "Marine-grade façade grazer with interchangeable optics — the exterior workhorse of the Vela line.",
     description:
-      "Firma grazes brick, stone, and board-formed concrete with tight optical control and a marine-grade housing we warranty for ten years outdoors. Snap-change optics (6°×6° to 60°×10°) let designers tune the graze on site. Powers our landmark façade work.",
+      "Firma grazes brick, stone, and board-formed concrete with tight optical control and a marine-grade housing warrantied for ten years outdoors. Snap-change optics (6°×6° to 60°×10°) let designers tune the graze on site. Built for landmark façade work.",
     specs: {
       Section: "4 ft, linkable",
       Output: "1,100 lm/ft",

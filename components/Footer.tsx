@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CREDENTIALS } from "@/lib/site";
 
 export default function Footer() {
   return (
@@ -28,7 +29,7 @@ export default function Footer() {
               through fabrication through five years of service.
             </p>
             <p className="mono-note" style={{ marginTop: 18 }}>
-              LICENSED · INSURED · UL-LISTED SHOP
+              {CREDENTIALS}
             </p>
           </div>
           <div>

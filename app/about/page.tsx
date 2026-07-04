@@ -3,9 +3,9 @@ import Link from "next/link";
 import Reveal from "@/components/Reveal";
 
 export const metadata: Metadata = {
-  title: "The Company — A Vertically Integrated Architectural Lighting Platform",
+  title: "The Company — A New Atelier Built on an Old Craft",
   description:
-    "Four decades of lighting design, product distribution, and proprietary LED solutions through one vertically integrated operating model serving residential, hospitality, and commercial clients.",
+    "Lighting design, product distribution, and a proprietary LED line under one vertically integrated operating model — a new venture serving residential, hospitality, and commercial clients.",
 };
 
 export default function AboutPage() {
@@ -21,16 +21,16 @@ export default function AboutPage() {
           <Reveal><span className="eyebrow">The company</span></Reveal>
           <Reveal delay={80}>
             <h1 className="h-xl" style={{ marginTop: 18, maxWidth: "18ch" }}>
-              A vertically integrated <span className="italic-accent">platform for light.</span>
+              A new atelier built on an <span className="italic-accent">old craft.</span>
             </h1>
           </Reveal>
           <Reveal delay={140}>
             <p className="lede" style={{ marginTop: 22 }}>
-              Lumenwright is an established architectural lighting platform —
-              a unique combination of lighting design, product distribution,
-              and proprietary LED product solutions under one operating model.
-              From design and specification through procurement, delivery, and
-              project implementation, one team is accountable for the light.
+              Lumenwright is a young company with a deliberate design: lighting
+              design, product distribution, and a proprietary LED line combined
+              under one vertically integrated operating model. From design and
+              specification through procurement, delivery, and project
+              implementation, one team is accountable for the light.
             </p>
           </Reveal>
         </div>
@@ -40,9 +40,9 @@ export default function AboutPage() {
       <section className="section-tight">
         <div className="container grid-3">
           {[
-            ["Design & specification", "In-house lighting designers serving residential, hospitality, and commercial clients — from a single room to full-building photometric packages."],
-            ["Distribution & procurement", "Established manufacturer relationships and project logistics: we specify, procure, stage, and deliver so projects hit their dates."],
-            ["Proprietary product — Vela Series", "Our own LED line, born from an unmet need inside our projects, validated across our portfolio, and manufactured by a trusted third-party partner."],
+            ["Design & specification", "Lighting design for residential, hospitality, and commercial clients — from a single room to full-building photometric packages."],
+            ["Distribution & procurement", "Vetted manufacturing partners and project logistics: we specify, procure, stage, and deliver so projects hit their dates."],
+            ["Proprietary product — Vela Series", "Our own LED line, engineered with a third-party manufacturing partner around details off-the-shelf product couldn't hold."],
           ].map(([t, b], i) => (
             <Reveal key={t} delay={i * 80}>
               <div className="card card-lit" style={{ minHeight: 220 }}>
@@ -60,21 +60,24 @@ export default function AboutPage() {
         <div className="container grid-2" style={{ gap: 56 }}>
           <Reveal>
             <div>
-              <span className="eyebrow">Four decades in</span>
+              <span className="eyebrow">Why we exist</span>
               <h2 className="h-lg" style={{ margin: "16px 0" }}>
-                Reputation is the moat.
+                The gap we&apos;re here to fill.
               </h2>
               <p style={{ color: "var(--text-dim)", marginBottom: 16 }}>
-                More than forty years of combined industry experience have
-                built a reputation for technical expertise, design excellence,
-                and customer service — and with it, long-standing relationships
-                with architects, designers, developers, contractors, and end
-                users who bring us back project after project.
+                Nobody serves this market whole: design studios don&apos;t
+                touch wiring, electricians don&apos;t restore crystal, and
+                retrofit outfits sell wattage instead of light. Lumenwright was
+                founded to do all of it under one roof — custom design, vintage
+                rehabilitation, rare chandelier repair, and turnkey LED
+                conversion.
               </p>
               <p style={{ color: "var(--text-dim)" }}>
-                That trust shows up as a diversified revenue base and an active
-                pipeline of projects extending several years into the future,
-                carried by an experienced team with deep industry knowledge.
+                We&apos;re earning our reputation the only way it can be
+                earned: one documented restoration, one commissioned install,
+                one five-year service promise at a time. Every dossier, every
+                rebate filing, every dimming curve is built to make the second
+                project inevitable.
               </p>
             </div>
           </Reveal>
@@ -86,16 +89,15 @@ export default function AboutPage() {
               </h2>
               <p style={{ color: "var(--text-dim)", marginBottom: 16 }}>
                 The Vela Series began when no channel on the market could give
-                our own installs a truly seamless, dot-free line of warm light.
-                So we engineered one — then a downlight, a cove optic, a façade
-                grazer, and a scene engine. Every product was proven on our own
-                jobs before we offered it for specification.
+                our installs a truly seamless, dot-free line of warm light at a
+                price a real project could carry. So we engineered one with our
+                manufacturing partner — then a downlight, a cove optic, a
+                façade grazer, and a scene engine.
               </p>
               <p style={{ color: "var(--text-dim)" }}>
-                Product sales have historically been driven by our internal
-                projects; the opportunity ahead is third-party growth through
-                specification-driven demand, distribution partnerships, and
-                broader market penetration.
+                Every Vela piece is proven on our own jobs before it&apos;s
+                offered for specification, and the line will grow the same way:
+                project first, product second, spec sheet last.
               </p>
               <div style={{ marginTop: 22 }}>
                 <Link href="/products?cat=vela-series" className="btn btn-ghost">
@@ -111,7 +113,7 @@ export default function AboutPage() {
       <section className="section">
         <div className="container">
           <div className="section-head">
-            <Reveal><span className="eyebrow">The opportunity</span></Reveal>
+            <Reveal><span className="eyebrow">The road ahead</span></Reveal>
             <Reveal delay={80}>
               <h2 className="h-lg" style={{ maxWidth: "24ch" }}>
                 Low overhead. High potential. Multiple ways to grow.
@@ -119,18 +121,17 @@ export default function AboutPage() {
             </Reveal>
             <Reveal delay={140}>
               <p className="lede">
-                An integrated platform, established market position, recognized
-                reputation, and several distinct growth avenues — a compelling
-                position for an entrepreneur or designer with electrical
-                aptitude, and for strategic or financial partners seeking entry
-                into specialized architectural lighting.
+                The business is deliberately built lean — made-to-order
+                inventory, manufacturing partners, no warehouse — with four
+                distinct avenues to scale as the atelier earns its market. This
+                is where we&apos;re headed.
               </p>
             </Reveal>
           </div>
           <div className="grid-4">
             {[
-              ["Vela third-party sales", "Marketing, spec-driven demand, and distribution partnerships beyond our own projects."],
-              ["Turnkey retrofit scale", "Recurring commercial conversions with five-year service relationships attached."],
+              ["Vela third-party sales", "Grow the line beyond our own projects through spec-driven demand and distribution partnerships."],
+              ["Turnkey retrofit scale", "Commercial conversions that each attach a five-year service relationship."],
               ["AI-led acquisition", "The photo-to-plan studio turns site visitors into design consultations around the clock."],
               ["Restoration niche", "Rare-chandelier and vintage work with almost no credible competition."],
             ].map(([t, b], i) => (

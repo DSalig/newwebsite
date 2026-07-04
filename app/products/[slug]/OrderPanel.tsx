@@ -9,8 +9,7 @@
 import { useState } from "react";
 import { submitOrderRequest } from "@/lib/supabase";
 import { formatPrice, type Product } from "@/lib/products";
-
-const CONTACT_EMAIL = "orders@lumenwright.example";
+import { ORDERS_EMAIL } from "@/lib/site";
 
 export default function OrderPanel({ product }: { product: Product }) {
   const [selections, setSelections] = useState<Record<string, string>>(() =>
@@ -50,7 +49,7 @@ export default function OrderPanel({ product }: { product: Product }) {
         `Notes: ${notes}`,
         `From: ${name} <${email}>`,
       ].join("\n");
-      window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+      window.location.href = `mailto:${ORDERS_EMAIL}?subject=${encodeURIComponent(
         `Order request — ${product.name}`
       )}&body=${encodeURIComponent(body)}`;
       setState("fallback");

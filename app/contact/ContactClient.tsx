@@ -4,8 +4,7 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Reveal from "@/components/Reveal";
 import { submitLead } from "@/lib/supabase";
-
-const CONTACT_EMAIL = "hello@lumenwright.example";
+import { CONTACT_EMAIL } from "@/lib/site";
 
 const INTERESTS = [
   ["consultation", "Design consultation"],

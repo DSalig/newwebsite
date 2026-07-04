@@ -49,10 +49,10 @@ export default function TradePage() {
           </Reveal>
           <Reveal delay={140}>
             <p className="lede" style={{ marginTop: 22 }}>
-              Long-standing relationships with architects, designers,
-              developers, and contractors are the foundation of this business.
-              Here&apos;s what working with the atelier looks like from your
-              side of the drawings.
+              This business is built to earn architects&apos;, designers&apos;,
+              and contractors&apos; repeat work — starting with the first
+              project. Here&apos;s what working with the atelier looks like
+              from your side of the drawings.
             </p>
           </Reveal>
         </div>
