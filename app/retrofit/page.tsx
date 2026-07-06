@@ -3,6 +3,7 @@ import Link from "next/link";
 import Reveal from "@/components/Reveal";
 import RoiCalculator from "@/components/RoiCalculator";
 import ProductCard from "@/components/ProductCard";
+import DesignerConcierge from "@/components/DesignerConcierge";
 import { productsByCategory } from "@/lib/products";
 
 export const metadata: Metadata = {
@@ -129,6 +130,19 @@ export default function RetrofitPage() {
               </Reveal>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* network routing for out-of-area / design-led projects */}
+      <section className="section-tight" style={{ background: "var(--bg-2)", borderTop: "1px solid var(--line)" }}>
+        <div className="container" style={{ maxWidth: 880 }}>
+          <Reveal>
+            <DesignerConcierge
+              context={{ kind: "retrofit" }}
+              heading="Outside our service area — or want design-led scope?"
+              sub="Our designer network covers projects we can't reach ourselves. Tell us where the building is and we'll hand-match you with a vetted local partner who runs the conversion with our program, products, and rebate support behind them."
+            />
+          </Reveal>
         </div>
       </section>
 

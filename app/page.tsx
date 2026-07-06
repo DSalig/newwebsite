@@ -311,9 +311,14 @@ export default function HomePage() {
                 first — technical rigor, design excellence, and showing up for
                 year five the way we showed up on day one.
               </p>
-              <Link href="/trade" className="btn btn-ghost">
-                Partner with the atelier →
-              </Link>
+              <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                <Link href="/designers" className="btn btn-primary">
+                  Find a designer near you
+                </Link>
+                <Link href="/trade" className="btn btn-ghost">
+                  Partner with the atelier →
+                </Link>
+              </div>
             </div>
           </Reveal>
         </div>

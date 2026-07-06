@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
 import ProductCard from "@/components/ProductCard";
+import DesignerConcierge from "@/components/DesignerConcierge";
 import { getProduct } from "@/lib/products";
 import type { Analysis } from "@/app/api/analyze/route";
 
@@ -234,6 +235,17 @@ export default function StudioClient() {
                   </div>
                 </div>
               )}
+
+              {/* human interjection: plan + area decided → hand to a person */}
+              <DesignerConcierge
+                context={{
+                  kind: "studio-plan",
+                  roomType,
+                  productSlugs: recommendedSlugs,
+                  source: result.source,
+                }}
+                sub="This plan is a strong start — a local designer makes it real. Tell us where the project is and we'll hand-match you with a vetted lighting designer from our network within one business day. Your plan travels with the introduction."
+              />
 
               <div className="card" style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center", justifyContent: "space-between" }}>
                 <div>

@@ -55,3 +55,40 @@ export async function submitOrderRequest(
   const { error } = await sb.from("order_requests").insert(payload);
   return !error;
 }
+
+export interface DesignerReferralPayload {
+  name: string;
+  email: string;
+  location: string;
+  notes?: string;
+  context: Record<string, unknown>;
+  context_summary: string;
+}
+
+export async function submitDesignerReferral(
+  payload: DesignerReferralPayload
+): Promise<boolean> {
+  const sb = getSupabase();
+  if (!sb) return false;
+  const { error } = await sb.from("designer_referrals").insert(payload);
+  return !error;
+}
+
+export interface DesignerApplicationPayload {
+  name: string;
+  studio: string;
+  email: string;
+  location: string;
+  specialties: string[];
+  portfolio_url?: string;
+  message?: string;
+}
+
+export async function submitDesignerApplication(
+  payload: DesignerApplicationPayload
+): Promise<boolean> {
+  const sb = getSupabase();
+  if (!sb) return false;
+  const { error } = await sb.from("designer_applications").insert(payload);
+  return !error;
+}

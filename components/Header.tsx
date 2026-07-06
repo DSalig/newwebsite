@@ -9,6 +9,7 @@ const LINKS = [
   { href: "/retrofit", label: "LED Retrofit" },
   { href: "/products", label: "Shop" },
   { href: "/studio", label: "AI Studio" },
+  { href: "/designers", label: "Designers" },
   { href: "/trade", label: "Trade" },
   { href: "/about", label: "Company" },
 ];

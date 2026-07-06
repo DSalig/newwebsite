@@ -10,6 +10,7 @@ import { useState } from "react";
 import { submitOrderRequest } from "@/lib/supabase";
 import { formatPrice, type Product } from "@/lib/products";
 import { ORDERS_EMAIL } from "@/lib/site";
+import DesignerConcierge from "@/components/DesignerConcierge";
 
 export default function OrderPanel({ product }: { product: Product }) {
   const [selections, setSelections] = useState<Record<string, string>>(() =>
@@ -21,6 +22,7 @@ export default function OrderPanel({ product }: { product: Product }) {
   const [email, setEmail] = useState("");
   const [notes, setNotes] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "done" | "fallback">("idle");
+  const [showConcierge, setShowConcierge] = useState(false);
 
   const pick = (group: string, value: string) =>
     setSelections((s) => ({ ...s, [group]: value }));
@@ -160,6 +162,32 @@ export default function OrderPanel({ product }: { product: Product }) {
           with the request pre-filled instead.
         </p>
       )}
+
+      {/* human interjection: fixture decided → offer a full-service designer */}
+      <div style={{ marginTop: 28, borderTop: "1px solid var(--line)", paddingTop: 22 }}>
+        {!showConcierge ? (
+          <button
+            type="button"
+            className="option-pill"
+            onClick={() => setShowConcierge(true)}
+            style={{ fontSize: 14 }}
+          >
+            ✦ Prefer full-service? Get matched with a local designer →
+          </button>
+        ) : (
+          <DesignerConcierge
+            compact
+            context={{
+              kind: "product-order",
+              productSlug: product.slug,
+              productName: product.name,
+              options: selections,
+            }}
+            heading="Make it a full project"
+            sub="A vetted local designer from our network can take this piece from configuration through installation — sizing, dimming, permits, the lot. Your selected options travel with the introduction."
+          />
+        )}
+      </div>
     </div>
   );
 }

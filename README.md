@@ -27,6 +27,7 @@ AI-native core feature.
 | `/products` | 30-piece made-to-order catalog across 6 categories, filterable |
 | `/products/[slug]` | Product detail: procedural SVG art, specs, custom options, order request |
 | `/about` | The vertically integrated platform story + Vela Series + growth avenues |
+| `/designers` | **Designer network** — concierge matching, live member directory, join application |
 | `/trade` | Architects, designers, developers, contractors |
 | `/contact` | Consultation booking (interest presets via `?interest=`) |
 
@@ -54,6 +55,24 @@ Leads land in `leads`, product configurations in `order_requests`
 (status flow: `new → confirmed → sent_to_manufacturer → fulfilled` — matching
 the made-to-order, manufacturer-fulfilled model), and studio sessions in
 `ai_consultations`.
+
+## Designer network (human service interjections)
+
+A reusable concierge block (`components/DesignerConcierge.tsx`) appears at the
+four moments a visitor has already decided fixture type and area:
+
+1. **AI studio result** — after the plan renders, with the plan as context
+2. **Product order panel** — "prefer full-service?" toggle, options as context
+3. **Retrofit page** — routing for out-of-area / design-led conversions
+4. **`/designers`** — the network page: how matching works, concierge form,
+   live directory, and a designer application form
+
+The network launches **concierge-first and honest**: no fabricated profiles.
+Match requests land in `designer_referrals` (status: `new → matched →
+introduced → closed`) for hand-matching; designer applications land in
+`designer_applications`; vetted members added to `designers` (via service
+role) appear automatically in the public directory. Without Supabase, both
+forms fall back to pre-filled email.
 
 ## Enabling real AI photo analysis
 

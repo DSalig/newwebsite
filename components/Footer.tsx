@@ -40,6 +40,7 @@ export default function Footer() {
               <li><Link href="/services#chandelier">Chandelier repair</Link></li>
               <li><Link href="/retrofit">Turnkey LED retrofit</Link></li>
               <li><Link href="/studio">AI lighting studio</Link></li>
+              <li><Link href="/designers">Designer network</Link></li>
             </ul>
           </div>
           <div>

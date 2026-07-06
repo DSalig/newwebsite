@@ -15,8 +15,8 @@ const PARTNERS = [
     cta: "Request spec binder",
   },
   {
-    who: "Interior designers",
-    what: "Trade pricing on the full collection, custom finishes to your schemes, and a restoration bench for the estate pieces your clients inherit.",
+    who: "Interior & lighting designers",
+    what: "Trade pricing on the full collection, custom finishes to your schemes, a restoration bench for estate pieces — and our designer network, which sends hand-matched local projects your way.",
     cta: "Open a trade account",
   },
   {
@@ -73,6 +73,23 @@ export default function TradePage() {
               </div>
             </Reveal>
           ))}
+          <Reveal delay={280}>
+            <div className="card card-lit" style={{ minHeight: 230, display: "flex", flexDirection: "column", borderColor: "var(--candela-dim)" }}>
+              <span className="chip" style={{ marginBottom: 14, width: "fit-content" }}>NEW · FOUNDING MEMBERS</span>
+              <h3 className="h-md" style={{ marginBottom: 10 }}>The designer network</h3>
+              <p style={{ flex: 1 }}>
+                Independent lighting designers: we hand-match you with
+                pre-scoped local projects from our AI studio and storefront,
+                and back your work with fabrication, products, and rebate
+                support.
+              </p>
+              <div style={{ marginTop: 20 }}>
+                <Link href="/designers#join" className="btn btn-primary">
+                  Join the network →
+                </Link>
+              </div>
+            </div>
+          </Reveal>
         </div>
       </section>
 

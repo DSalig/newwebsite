@@ -13,6 +13,8 @@ const INTERESTS = [
   ["retrofit", "Turnkey LED retrofit (site audit)"],
   ["ai-plan", "Review my AI lighting plan"],
   ["trade", "Trade / partner account"],
+  ["find-designer", "Match me with a local designer"],
+  ["join-network", "Join the designer network"],
   ["partnership", "Business partnership / investment"],
   ["other", "Something else"],
 ] as const;
