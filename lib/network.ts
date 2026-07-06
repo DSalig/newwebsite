@@ -63,11 +63,18 @@ export function describeContext(ctx: ReferralContext): string {
 export async function fetchActiveDesigners(): Promise<Designer[]> {
   const sb = getSupabase();
   if (!sb) return [];
-  const { data, error } = await sb
-    .from("designers")
-    .select("slug, name, studio, metros, specialties, bio, credentials, website")
-    .eq("active", true)
-    .order("name");
-  if (error || !data) return [];
-  return data as Designer[];
+  const attempt = (async () => {
+    const { data, error } = await sb
+      .from("designers")
+      .select("slug, name, studio, metros, specialties, bio, credentials, website")
+      .eq("active", true)
+      .order("name");
+    if (error || !data) return [];
+    return data as Designer[];
+  })().catch(() => [] as Designer[]);
+  // stalled or failed → honest empty state, never a hung page
+  return Promise.race([
+    attempt,
+    new Promise<Designer[]>((resolve) => setTimeout(() => resolve([]), 8000)),
+  ]);
 }

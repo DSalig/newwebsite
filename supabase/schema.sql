@@ -115,6 +115,15 @@ insert into storage.buckets (id, name, public)
 values ('spaces', 'spaces', false)
 on conflict (id) do nothing;
 
+-- ── table privileges ────────────────────────────────────────
+-- RLS policies below govern rows; these grants are the coarse
+-- layer PostgREST checks first. Required on projects where
+-- default privileges don't cover manually created tables.
+grant usage on schema public to anon, authenticated;
+grant select on public.categories, public.products, public.designers to anon, authenticated;
+grant insert on public.leads, public.order_requests, public.ai_consultations,
+  public.designer_referrals, public.designer_applications to anon, authenticated;
+
 -- ── row level security ──────────────────────────────────────
 alter table categories enable row level security;
 alter table products enable row level security;

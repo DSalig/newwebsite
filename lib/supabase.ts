@@ -38,22 +38,39 @@ export interface OrderRequestPayload {
   notes?: string;
 }
 
-/** Insert a lead; returns true on success, false if Supabase is
- *  unavailable (caller should fall back to mailto). */
-export async function submitLead(payload: LeadPayload): Promise<boolean> {
+/** Resolve to `fallback` if the promise hasn't settled in `ms` —
+ *  keeps forms from hanging on stalled connections. */
+function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return Promise.race([
+    p,
+    new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms)),
+  ]);
+}
+
+const SUBMIT_TIMEOUT_MS = 8000;
+
+/** Insert into a table; returns true on success, false on any
+ *  failure — unconfigured client, RLS/permission error, a hard
+ *  network throw, or a stalled connection — so callers can always
+ *  fall back to mailto. */
+async function tryInsert(table: string, payload: object): Promise<boolean> {
   const sb = getSupabase();
   if (!sb) return false;
-  const { error } = await sb.from("leads").insert(payload);
-  return !error;
+  const attempt = (async () => {
+    const { error } = await sb.from(table).insert(payload);
+    return !error;
+  })().catch(() => false);
+  return withTimeout(attempt, SUBMIT_TIMEOUT_MS, false);
+}
+
+export async function submitLead(payload: LeadPayload): Promise<boolean> {
+  return tryInsert("leads", payload);
 }
 
 export async function submitOrderRequest(
   payload: OrderRequestPayload
 ): Promise<boolean> {
-  const sb = getSupabase();
-  if (!sb) return false;
-  const { error } = await sb.from("order_requests").insert(payload);
-  return !error;
+  return tryInsert("order_requests", payload);
 }
 
 export interface DesignerReferralPayload {
@@ -68,10 +85,7 @@ export interface DesignerReferralPayload {
 export async function submitDesignerReferral(
   payload: DesignerReferralPayload
 ): Promise<boolean> {
-  const sb = getSupabase();
-  if (!sb) return false;
-  const { error } = await sb.from("designer_referrals").insert(payload);
-  return !error;
+  return tryInsert("designer_referrals", payload);
 }
 
 export interface DesignerApplicationPayload {
@@ -87,8 +101,5 @@ export interface DesignerApplicationPayload {
 export async function submitDesignerApplication(
   payload: DesignerApplicationPayload
 ): Promise<boolean> {
-  const sb = getSupabase();
-  if (!sb) return false;
-  const { error } = await sb.from("designer_applications").insert(payload);
-  return !error;
+  return tryInsert("designer_applications", payload);
 }
