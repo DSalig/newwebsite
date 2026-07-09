@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import ProductArt from "@/components/ProductArt";
+import ProductVisual from "@/components/ProductVisual";
 import ProductCard from "@/components/ProductCard";
 import OrderPanel from "./OrderPanel";
 import { PRODUCTS, getProduct, getCategory, productsByCategory } from "@/lib/products";
@@ -60,11 +60,12 @@ export default async function ProductPage({
                   aspectRatio: "1 / 0.95",
                 }}
               >
-                <ProductArt
+                <ProductVisual
+                  slug={product.slug}
                   kind={product.art}
                   palette={product.palette}
-                  seed={product.slug}
                   size={380}
+                  alt={product.name}
                 />
               </div>
               <div style={{ marginTop: 26 }}>

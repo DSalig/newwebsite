@@ -1,5 +1,5 @@
 import Link from "next/link";
-import ProductArt from "./ProductArt";
+import ProductVisual from "./ProductVisual";
 import { formatPrice, getCategory, type Product } from "@/lib/products";
 
 export default function ProductCard({ product }: { product: Product }) {
@@ -7,11 +7,12 @@ export default function ProductCard({ product }: { product: Product }) {
   return (
     <Link href={`/products/${product.slug}`} className="product-card">
       <div className="product-art">
-        <ProductArt
+        <ProductVisual
+          slug={product.slug}
           kind={product.art}
           palette={product.palette}
-          seed={product.slug}
           size={210}
+          alt={product.name}
         />
       </div>
       <div className="product-body">
