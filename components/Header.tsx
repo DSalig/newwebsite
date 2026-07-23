@@ -3,64 +3,55 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-
-const LINKS = [
-  { href: "/services", label: "Services" },
-  { href: "/retrofit", label: "LED Retrofit" },
-  { href: "/products", label: "Shop" },
-  { href: "/studio", label: "AI Studio" },
-  { href: "/designers", label: "Designers" },
-  { href: "/trade", label: "Trade" },
-  { href: "/about", label: "Company" },
-];
+import { announcement, nav, site } from "@/lib/site";
+import { useCart } from "@/lib/cart";
 
 export default function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const { count } = useCart();
+
+  // The admin console has its own chrome.
+  if (pathname?.startsWith("/admin")) return null;
 
   return (
-    <header className="site-header">
-      <div className="container header-inner">
-        <Link href="/" className="logo" aria-label="Lumenwright home">
-          <span className="logo-mark breathe" aria-hidden="true" />
-          Lumenwright
-        </Link>
-
-        <nav aria-label="Primary">
-          <ul className="nav-links" data-open={open}>
-            {LINKS.map((l) => (
-              <li key={l.href}>
-                <Link
-                  href={l.href}
-                  data-active={pathname?.startsWith(l.href)}
-                  onClick={() => setOpen(false)}
-                >
-                  {l.label}
-                </Link>
-              </li>
-            ))}
-            <li>
-              <Link href="/contact" onClick={() => setOpen(false)}>
-                Contact
-              </Link>
-            </li>
-          </ul>
-        </nav>
-
-        <div className="nav-cta">
-          <Link href="/contact" className="btn btn-primary">
-            Book a consultation
+    <>
+      <div className="announce">{announcement}</div>
+      <header className="header">
+        <div className="header-inner">
+          <Link href="/" className="logo" aria-label={`${site.name} home`}>
+            Pep<span>thea</span>
           </Link>
-          <button
-            className="nav-toggle"
-            aria-expanded={open}
-            aria-label="Toggle navigation"
-            onClick={() => setOpen(!open)}
-          >
-            {open ? "✕" : "☰"}
-          </button>
+          <nav aria-label="Main">
+            <ul className={`nav-links ${open ? "open" : ""}`} style={{ listStyle: "none" }}>
+              {nav.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className={pathname === item.href ? "active" : ""}
+                    onClick={() => setOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <div style={{ display: "flex", gap: "0.6rem", alignItems: "center" }}>
+            <Link href="/cart" className="cart-btn" aria-label={`Cart, ${count} items`}>
+              Cart {count > 0 && <span className="cart-count">{count}</span>}
+            </Link>
+            <button
+              className="menu-toggle"
+              aria-expanded={open}
+              aria-label="Toggle menu"
+              onClick={() => setOpen((v) => !v)}
+            >
+              {open ? "×" : "☰"}
+            </button>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+    </>
   );
 }

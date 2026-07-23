@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import ProductVisual from "@/components/ProductVisual";
 import ProductCard from "@/components/ProductCard";
-import OrderPanel from "./OrderPanel";
-import { PRODUCTS, getProduct, getCategory, productsByCategory } from "@/lib/products";
+import Reveal from "@/components/Reveal";
+import { getProduct, products } from "@/lib/products";
+import { site } from "@/lib/site";
+import BuyPanel from "./BuyPanel";
 
 export function generateStaticParams() {
-  return PRODUCTS.map((p) => ({ slug: p.slug }));
+  return products.map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({
@@ -18,7 +20,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const product = getProduct(slug);
   if (!product) return {};
-  return { title: product.name, description: product.blurb };
+  return { title: product.name, description: product.tagline };
 }
 
 export default async function ProductPage({
@@ -30,90 +32,90 @@ export default async function ProductPage({
   const product = getProduct(slug);
   if (!product) notFound();
 
-  const cat = getCategory(product.category)!;
-  const related = productsByCategory(product.category)
-    .filter((p) => p.slug !== product.slug)
-    .slice(0, 3);
+  const pairs = product.pairsWith
+    .map((s) => getProduct(s))
+    .filter((x): x is NonNullable<typeof x> => Boolean(x));
 
   return (
-    <>
-      <section className="section-tight" style={{ paddingTop: 48 }}>
-        <div className="container">
-          <p className="mono-note" style={{ marginBottom: 26 }}>
-            <Link href="/products" style={{ color: "var(--text-dim)" }}>COLLECTION</Link>
-            {" / "}
-            <Link href={`/products?cat=${cat.slug}`} style={{ color: "var(--text-dim)" }}>
-              {cat.name.toUpperCase()}
-            </Link>
-            {" / "}
-            <span style={{ color: "var(--candela)" }}>{product.sku}</span>
-          </p>
+    <section className="section">
+      <div className="wrap">
+        <p className="mono muted" style={{ marginBottom: "1.5rem" }}>
+          <Link href="/shop">Shop</Link> / {product.category} / {product.shortName}
+        </p>
 
-          <div className="grid-2" style={{ gap: 56, alignItems: "start" }}>
-            {/* art */}
-            <div>
-              <div
-                className="product-art"
-                style={{
-                  borderRadius: "var(--radius-lg)",
-                  border: "1px solid var(--line)",
-                  aspectRatio: "1 / 0.95",
-                }}
-              >
-                <ProductVisual
-                  slug={product.slug}
-                  kind={product.art}
-                  palette={product.palette}
-                  size={380}
-                  alt={product.name}
-                />
-              </div>
-              <div style={{ marginTop: 26 }}>
-                <h2 className="h-md" style={{ marginBottom: 14 }}>Specifications</h2>
-                <table className="table-simple">
-                  <tbody>
-                    {Object.entries(product.specs).map(([k, v]) => (
-                      <tr key={k}>
-                        <td>{k}</td>
-                        <td>{v}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+        <div className="grid cols-2" style={{ gap: "3rem", alignItems: "start" }}>
+          <Reveal>
+            <ProductVisual product={product} />
+            <div className="notice" style={{ marginTop: "1rem" }}>
+              <span className="mono">LOT {product.batch.lot}</span> · manufactured{" "}
+              {product.batch.mfg} · best by {product.batch.exp} ·{" "}
+              <Link href={`/quality?lot=${product.batch.lot}`} style={{ textDecoration: "underline" }}>
+                view certificate of analysis
+              </Link>
+            </div>
+          </Reveal>
+
+          <Reveal delay={80}>
+            <p className="eyebrow">{product.category}</p>
+            <h1 className="display" style={{ fontSize: "clamp(1.8rem, 4vw, 2.6rem)" }}>
+              {product.name}
+            </h1>
+            <p className="lede" style={{ margin: "0.8rem 0 1.4rem" }}>{product.tagline}</p>
+            <p style={{ color: "var(--ink-soft)", marginBottom: "1.4rem" }}>{product.description}</p>
+
+            <BuyPanel product={product} />
+
+            {product.ingestible && (
+              <p className="small muted" style={{ marginTop: "1rem" }}>*{site.fdaDisclaimer}</p>
+            )}
+
+            <hr className="hr" />
+
+            <h3 className="display">Actives, disclosed</h3>
+            <div className="table-scroll" style={{ margin: "0.8rem 0 1.4rem" }}>
+              <table className="data">
+                <thead>
+                  <tr><th>Active</th><th>INCI / amount</th><th>Dose</th><th>Function</th></tr>
+                </thead>
+                <tbody>
+                  {product.actives.map((a) => (
+                    <tr key={a.name}>
+                      <td><strong>{a.name}</strong></td>
+                      <td className="mono" style={{ whiteSpace: "normal" }}>{a.inci}</td>
+                      <td>{a.pct}</td>
+                      <td style={{ whiteSpace: "normal" }}>{a.role}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
 
-            {/* details + order */}
-            <div>
-              <h1 className="h-lg">{product.name}</h1>
-              <p style={{ color: "var(--text-dim)", margin: "18px 0 26px" }}>{product.description}</p>
+            <h3 className="display">How to use</h3>
+            <ul style={{ margin: "0.8rem 0 1.4rem 1.2rem", color: "var(--ink-soft)" }}>
+              {product.howToUse.map((step) => <li key={step}>{step}</li>)}
+            </ul>
 
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 30 }}>
-                <span className="chip-quiet chip">Made to order</span>
-                <span className="chip-quiet chip">
-                  Ships in {product.leadTimeWeeks[0]}–{product.leadTimeWeeks[1]} weeks
-                </span>
-                <span className="chip">Custom options available</span>
-              </div>
-
-              <OrderPanel product={product} />
-            </div>
-          </div>
+            <h3 className="display">What the evidence says</h3>
+            <p style={{ margin: "0.8rem 0", color: "var(--ink-soft)" }}>{product.evidence}</p>
+            <p className="small muted">
+              More detail on <Link href="/science" style={{ textDecoration: "underline" }}>The Science</Link>.
+            </p>
+          </Reveal>
         </div>
-      </section>
 
-      {related.length > 0 && (
-        <section className="section-tight" style={{ borderTop: "1px solid var(--line)" }}>
-          <div className="container">
-            <h2 className="h-md" style={{ marginBottom: 26 }}>More from {cat.name}</h2>
-            <div className="grid-3">
-              {related.map((p) => (
-                <ProductCard key={p.slug} product={p} />
+        {pairs.length > 0 && (
+          <div style={{ marginTop: "4rem" }}>
+            <Reveal>
+              <h2 className="display">Pairs with</h2>
+            </Reveal>
+            <div className="grid cols-3" style={{ marginTop: "1.5rem" }}>
+              {pairs.map((p, i) => (
+                <Reveal key={p.slug} delay={i * 60}><ProductCard product={p} /></Reveal>
               ))}
             </div>
           </div>
-        </section>
-      )}
-    </>
+        )}
+      </div>
+    </section>
   );
 }

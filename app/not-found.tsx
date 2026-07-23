@@ -2,18 +2,16 @@ import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <section className="section" style={{ textAlign: "center", minHeight: "55vh", display: "grid", placeItems: "center" }}>
-      <div className="container">
-        <p className="eyebrow" style={{ justifyContent: "center" }}>404 · Lights out</p>
-        <h1 className="h-xl" style={{ margin: "18px auto", maxWidth: "16ch" }}>
-          This room isn&apos;t <span className="italic-accent">wired yet.</span>
-        </h1>
-        <p className="lede" style={{ margin: "0 auto 30px" }}>
-          The page you&apos;re after doesn&apos;t exist — but the collection does.
+    <section className="section">
+      <div className="wrap" style={{ textAlign: "center" }}>
+        <p className="eyebrow">404</p>
+        <h1 className="display">This page didn&apos;t bond.</h1>
+        <p className="muted" style={{ margin: "1rem 0 2rem" }}>
+          The link may be old, or the product may have moved.
         </p>
-        <div className="hero-actions" style={{ justifyContent: "center" }}>
-          <Link href="/" className="btn btn-primary">Back to the atelier</Link>
-          <Link href="/products" className="btn btn-ghost">Browse the collection</Link>
+        <div style={{ display: "flex", gap: "0.8rem", justifyContent: "center" }}>
+          <Link href="/" className="btn btn-primary">Home</Link>
+          <Link href="/shop" className="btn btn-ghost">Shop</Link>
         </div>
       </div>
     </section>

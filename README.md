@@ -1,127 +1,147 @@
-# Lumenwright — The Light Atelier
+# Pepthea — Peptide Skincare & Wellness
 
-A turnkey creative lighting business website: custom-designed lighting
-installations, vintage lighting rehabilitation, rare chandelier repair, and
-turnkey LED retrofit programs — with an AI Lighting Studio that turns a photo
-of any space into a personalized, three-layer lighting plan.
+A complete peptide e-commerce platform: a 2026-trend storefront, an AI
+routine builder, batch-level lab-report transparency, Stripe checkout,
+and a Supabase backend covering **inventory management, CRM, and
+billing** with a password-gated staff console at `/admin`.
 
-Site copy is written for an **honest new-venture launch** — capability and
-promise claims only, no fabricated track record. Business identity (name,
-contact inboxes, footer credentials) lives in `lib/site.ts`; update it to
-match reality before going live.
+Built with **Next.js 15 + TypeScript** and **Supabase**. Zero-config by
+design: with no environment variables at all, the full site runs — the
+catalog serves from `lib/products.ts`, checkout captures order requests
+instead of payments, and the staff console shows demo data.
 
-Built with **Next.js 15 + TypeScript**, **Supabase** (catalog, leads, order
-requests, AI consultations), and **Claude vision** for the photo-to-plan
-studio. Designed on 2026 UX patterns: a dark, light-native aesthetic,
-expressive serif display type, bento layouts, grain, scroll reveals, and an
-AI-native core feature.
+## The positioning decision (read this first)
+
+Pepthea sells **cosmetic (topical) and dietary (ingestible) peptides
+only** — peptide serums, moisturizers, and collagen supplements. It
+deliberately does **not** sell injectable or "research use only"
+peptides: that market is unapproved-drug territory where Stripe,
+Shopify, and PayPal all prohibit processing, ad platforms ban
+promotion, and FDA enforcement is active. The legal peptide
+skincare/collagen category is one of the fastest-growing DTC segments
+and uses the same brand equity — that is where the durable business is.
+The site's copy discipline follows from this: appearance claims for
+cosmetics, authorized claims + FDA disclaimer for supplements, evidence
+graded honestly on every product page.
+
+## The name
+
+**Pepthea** (pepthea.com — verified available, ~$11/yr at time of
+build). Keeps the "pept-" root customers search for, ends in a warm,
+wellness-coded suffix, is pronounceable and trademark-screenable.
+Alternates checked and available at build time: aminuva.com,
+peptandco.com, peptivane.com.
 
 ## Pages
 
 | Route | What it does |
 | --- | --- |
-| `/` | Brand story, services bento, AI callout, featured products, retrofit strip |
-| `/services` | Custom installations · vintage rehabilitation · rare chandelier repair · modernization |
-| `/retrofit` | The turnkey LED conversion program + interactive ROI calculator |
-| `/studio` | **AI Lighting Studio** — upload a photo, get a personalized lighting plan |
-| `/products` | 30-piece made-to-order catalog across 6 categories, filterable |
-| `/products/[slug]` | Product detail: procedural SVG art, specs, custom options, order request |
-| `/about` | The vertically integrated platform story + Vela Series + growth avenues |
-| `/designers` | **Designer network** — concierge matching, live member directory, join application |
-| `/trade` | Architects, designers, developers, contractors |
-| `/contact` | Consultation booking (interest presets via `?interest=`) |
+| `/` | Hero, trust marquee, transparency bento, bestsellers, routine-builder callout, honest-launch note |
+| `/shop` | Filterable catalog (category × skin concern) |
+| `/products/[slug]` | PDP: disclosed actives table, evidence summary, batch + COA link, subscribe & save, sticky mobile buy bar |
+| `/quiz` | **AI Routine Builder** — 5 questions → sequenced AM/PM routine + layering warnings, add-all-to-cart |
+| `/science` | Peptide education with honest evidence grades (incl. why we don't sell injectables) |
+| `/quality` | Testing pipeline + **batch/COA lookup by lot number** |
+| `/cart` | Single-page cart + checkout (Stripe or graceful order-request fallback) |
+| `/about`, `/contact` | Brand story; contact form with Supabase → mailto fallback |
+| `/legal/*` | Terms, privacy, shipping & returns (starter copy — have counsel review) |
+| `/admin` | **Staff console**: KPIs, orders & billing ledger, inventory with reorder flags, CRM with LTV/segments |
 
 ## Quick start
 
 ```bash
 npm install
-npm run dev        # http://localhost:3000
+npm run dev        # http://localhost:3000  (everything works, demo mode)
 ```
 
-The site is fully functional with **zero configuration**: the catalog serves
-from `lib/products.ts`, the AI studio runs in demo mode (deterministic plans
-by room type), and forms fall back to a pre-filled `mailto:` handoff.
+## Wiring up the backend (Supabase)
 
-## Wiring up Supabase
+1. Create a project at supabase.com.
+2. SQL editor → run `supabase/schema.sql`, then `supabase/seed.sql`.
+3. Copy `.env.example` → `.env.local`, fill in the Supabase URL, anon
+   key, and (server-side only) service role key.
 
-1. Create a project at [supabase.com](https://supabase.com).
-2. Run `supabase/schema.sql` in the SQL editor (tables + RLS + storage bucket).
-3. Run `supabase/seed.sql` to load the catalog (regenerate anytime with
-   `node --experimental-strip-types scripts/generate-seed.ts`).
-4. Copy `.env.example` → `.env.local` and fill in
-   `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+Schema highlights:
 
-Leads land in `leads`, product configurations in `order_requests`
-(status flow: `new → confirmed → sent_to_manufacturer → fulfilled` — matching
-the made-to-order, manufacturer-fulfilled model), and studio sessions in
-`ai_consultations`.
+- **Inventory**: `inventory` (current stock) + `inventory_movements`
+  (append-only audit: receive/sale/return/adjust) + `batches` (lot,
+  COA URL, dates) — every stock number is explained by its ledger.
+- **CRM**: `customers` upserted from paid orders, `customer_overview`
+  view computes orders count, lifetime value, and subscription flag;
+  `crm_notes`, `leads`, `newsletter_subscribers`, `quiz_sessions`
+  capture every top-of-funnel touchpoint.
+- **Billing**: `orders` + `order_items` written by the Stripe webhook
+  through the idempotent `record_order` RPC (replay-safe), plus
+  `subscriptions` and `order_requests` (pre-Stripe fallback orders,
+  status `new → invoiced → paid → fulfilled`).
+- **RLS**: anon key can read the catalog and *insert only* into the
+  capture tables; orders/inventory/CRM are service-role only.
 
-## Designer network (human service interjections)
+## Turning on payments (Stripe)
 
-A reusable concierge block (`components/DesignerConcierge.tsx`) appears at the
-four moments a visitor has already decided fixture type and area:
+1. Set `STRIPE_SECRET_KEY` in `.env.local` — checkout immediately
+   switches from order-capture to real Stripe Checkout (prices are
+   resolved server-side from the catalog; the client never sends
+   prices).
+2. Register a webhook for `checkout.session.completed` at
+   `https://<domain>/api/stripe-webhook` and set
+   `STRIPE_WEBHOOK_SECRET`. The webhook verifies signatures (HMAC,
+   replay-protected), records the order, decrements inventory with
+   audit rows, and upserts the CRM customer.
+3. Subscribe & Save: first orders charge the discounted price at
+   checkout today. To automate renewals, create Stripe Products/Prices
+   per SKU and switch `/api/checkout` to `mode=subscription` for
+   subscription lines — the `subscriptions` table is ready for it.
 
-1. **AI studio result** — after the plan renders, with the plan as context
-2. **Product order panel** — "prefer full-service?" toggle, options as context
-3. **Retrofit page** — routing for out-of-area / design-led conversions
-4. **`/designers`** — the network page: how matching works, concierge form,
-   live directory, and a designer application form
+No Stripe SDK dependency — both routes use Stripe's REST API directly.
 
-The network launches **concierge-first and honest**: no fabricated profiles.
-Match requests land in `designer_referrals` (status: `new → matched →
-introduced → closed`) for hand-matching; designer applications land in
-`designer_applications`; vetted members added to `designers` (via service
-role) appear automatically in the public directory. Without Supabase, both
-forms fall back to pre-filled email.
+## Staff console
 
-## Enabling real AI photo analysis
+Set `ADMIN_PASSWORD` and `/admin` is gated by `middleware.ts` (salted
+SHA-256 session cookie, httpOnly). Unset, it runs in labeled demo mode
+so you can review the dashboards before configuring anything.
 
-Set `ANTHROPIC_API_KEY` in `.env.local` and the `/api/analyze` route reads
-uploaded photos with Claude vision, grounded in the product catalog, and
-returns the same JSON shape the demo mode produces — so the UI is identical
-either way and degrades gracefully on any failure.
+- **Overview** — 30-day revenue, orders, AOV, low-stock count, restock queue
+- **Orders & Billing** — full ledger with line items and status flow
+- **Inventory** — stock vs. reorder point per SKU with active lot
+- **Customers (CRM)** — LTV-sorted with derived segments (VIP / Subscriber / Repeat / New)
 
-Prefer to keep AI calls inside Supabase (e.g. static hosting)? Deploy the
-included edge function instead:
+## 2026 UX patterns implemented
 
-```bash
-supabase functions deploy analyze-space
-supabase secrets set ANTHROPIC_API_KEY=sk-ant-...
-```
-
-## Commerce: where Shopify fits
-
-Every piece is **made to order** — manufacturing partners fulfill on order —
-so the storefront intentionally captures *order requests* (configuration +
-contact) rather than taking payment blind. A designer confirms options, final
-pricing, and lead time first. When you're ready to take payment:
-
-- **Shopify**: create products mirroring `lib/products.ts` SKUs, then swap the
-  `OrderPanel` submit for a Shopify Storefront API `cartCreate` (env slots are
-  stubbed in `.env.example`), or embed Buy Buttons per SKU.
-- **Stripe**: a `checkout.sessions.create` call in a new API route works with
-  the same payload `OrderPanel` already builds.
-
-The `order_requests.status` column is designed to track fulfillment either way.
+Expressive serif display type + grain + warm "clinical wellness"
+palette; bento feature grids; scroll reveals (reduced-motion safe);
+AI-native quiz as a core journey; radical ingredient/COA transparency
+as the trust engine (in place of fake reviews — the site explicitly
+has none); subscribe & save with plain-language terms; single-page
+checkout with free-shipping progress bar; sticky mobile add-to-cart;
+SEO (per-page metadata, sitemap, robots with `/admin` disallowed).
 
 ## Project structure
 
 ```
-app/                 pages (App Router) + /api/analyze
-components/          Header, Footer, ProductArt (procedural SVG), ProductCard,
-                     Reveal (scroll animation), RoiCalculator
+app/                 storefront pages, /admin console, /api routes
+components/          Header, Footer, ProductCard, ProductVisual (procedural
+                     SVG art per SKU — swap for photos as they're shot),
+                     Reveal, Newsletter
+lib/site.ts          brand identity & compliance copy
 lib/products.ts      the catalog — single source of truth
-lib/supabase.ts      client + graceful fallbacks
-supabase/            schema.sql, seed.sql, analyze-space edge function
-scripts/             seed generator
-legacy/              pre-rebuild drafts kept for reference
+lib/cart.tsx         cart context (localStorage)
+lib/supabase.ts      anon + service clients, graceful fallbacks
+lib/admin-data.ts    staff-console data layer (live or demo)
+middleware.ts        /admin auth gate
+supabase/            schema.sql (tables, RLS, record_order RPC), seed.sql
+scripts/             seed generator (npm run seed)
+public/coa/          drop lab-report PDFs here, named <LOT>.pdf
 ```
 
-## Notes
+## Before you launch (operational checklist)
 
-- Product imagery is procedurally generated SVG (deterministic per SKU), so
-  the catalog ships looking consistent before photography exists — replace
-  `ProductArt` with real photos per product as they're shot.
-- The ROI calculator uses conservative published equipment/labor figures;
-  the turnkey program replaces it with a metered financial analysis.
-- All AI plans are labeled as drafts and positioned for human designer review.
+- [ ] Buy `pepthea.com`; run a trademark search on "Pepthea" (USPTO TESS)
+- [ ] Product liability insurance; FDA facility registration for the
+      supplement line (via your co-packer); confirm co-packer cGMP certs
+- [ ] Have counsel review `/legal/*` and all product claims
+- [ ] Replace procedural SVG art with real product photography
+- [ ] Commission real third-party COAs and drop PDFs in `public/coa/`
+- [ ] Set `ADMIN_PASSWORD`, Stripe keys, and webhook secret in production
+- [ ] Connect an email tool to `newsletter_subscribers` / `quiz_sessions`
+      (Resend/Klaviyo) for the winback + routine emails

@@ -11,11 +11,13 @@ export default function Reveal({
   delay = 0,
   as: Tag = "div",
   className = "",
+  style,
 }: {
   children: React.ReactNode;
   delay?: number;
   as?: keyof React.JSX.IntrinsicElements;
   className?: string;
+  style?: React.CSSProperties;
 }) {
   const ref = useRef<HTMLElement | null>(null);
 
@@ -46,7 +48,7 @@ export default function Reveal({
     <Component
       ref={ref}
       className={`reveal ${className}`}
-      style={delay ? { transitionDelay: `${delay}ms` } : undefined}
+      style={delay ? { ...style, transitionDelay: `${delay}ms` } : style}
     >
       {children}
     </Component>

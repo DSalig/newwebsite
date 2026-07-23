@@ -1,13 +1,14 @@
 {
-  "name": "lumenwright",
+  "name": "pepthea",
   "version": "1.0.0",
   "private": true,
-  "description": "Lumenwright — turnkey creative lighting studio: custom installations, vintage rehabilitation, rare chandelier repair, and LED retrofit programs with AI-powered lighting design.",
+  "description": "Pepthea — peptide skincare & collagen wellness e-commerce: 2026-trend storefront, AI routine builder, batch-level COA transparency, and a Supabase backend for inventory, CRM, and billing.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "seed": "node --experimental-strip-types scripts/generate-seed.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
