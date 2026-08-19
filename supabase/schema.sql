@@ -112,8 +112,11 @@ create index if not exists idx_order_items_order on order_items (order_id);
 create table if not exists subscriptions (
   id uuid primary key default gen_random_uuid(),
   customer_id uuid references customers(id) on delete cascade,
-  stripe_subscription_id text unique,
+  -- One Stripe subscription can cover several products (one row
+  -- per product), so uniqueness is composite.
+  stripe_subscription_id text,
   product_slug text not null,
+  unique (stripe_subscription_id, product_slug),
   qty integer not null default 1,
   interval_days integer not null default 60,
   status text not null default 'active'
@@ -279,3 +282,30 @@ create policy "anon insert newsletter" on newsletter_subscribers for insert with
 create policy "anon insert quiz" on quiz_sessions for insert with check (true);
 
 -- Everything else: service role only (no policies → denied for anon).
+
+-- ---------- authenticated user area ----------
+-- Signed-in customers (Supabase Auth) can read their own orders and
+-- subscriptions. Rows are matched on the verified JWT email, so
+-- history works even for orders placed before the account existed.
+-- Email changes go through Supabase's double-confirmation flow, so
+-- the claim is trustworthy.
+
+create policy "own orders" on orders
+  for select to authenticated
+  using (email = (auth.jwt() ->> 'email'));
+
+create policy "own order items" on order_items
+  for select to authenticated
+  using (exists (
+    select 1 from orders o
+    where o.id = order_items.order_id
+      and o.email = (auth.jwt() ->> 'email')
+  ));
+
+create policy "own subscriptions" on subscriptions
+  for select to authenticated
+  using (exists (
+    select 1 from customers c
+    where c.id = subscriptions.customer_id
+      and c.email = (auth.jwt() ->> 'email')
+  ));

@@ -5,11 +5,13 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { announcement, nav, site } from "@/lib/site";
 import { useCart } from "@/lib/cart";
+import { useAuth } from "@/lib/auth";
 
 export default function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const { count } = useCart();
+  const { user } = useAuth();
 
   // The admin console has its own chrome.
   if (pathname?.startsWith("/admin")) return null;
@@ -29,6 +31,7 @@ export default function Header() {
                   <Link
                     href={item.href}
                     className={pathname === item.href ? "active" : ""}
+                    aria-current={pathname === item.href ? "page" : undefined}
                     onClick={() => setOpen(false)}
                   >
                     {item.label}
@@ -38,6 +41,14 @@ export default function Header() {
             </ul>
           </nav>
           <div style={{ display: "flex", gap: "0.6rem", alignItems: "center" }}>
+            <Link
+              href="/account"
+              className="cart-btn"
+              aria-label={user ? "Your account" : "Sign in"}
+              title={user ? "Your account" : "Sign in"}
+            >
+              {user ? "Account" : "Sign in"}
+            </Link>
             <Link href="/cart" className="cart-btn" aria-label={`Cart, ${count} items`}>
               Cart {count > 0 && <span className="cart-count">{count}</span>}
             </Link>

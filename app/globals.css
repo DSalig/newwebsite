@@ -467,3 +467,78 @@ table.data tr:last-child td { border-bottom: 0; }
   overflow: hidden;
 }
 .progress-fill { height: 100%; background: var(--copper); border-radius: 999px; }
+
+/* ---------- interaction states (see docs/DESIGN-LANGUAGE.md) ---------- */
+
+/* loading */
+.spinner {
+  width: 1em;
+  height: 1em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.btn.loading { opacity: 0.75; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation-duration: 1.6s; }
+}
+
+.skeleton {
+  height: 1.1rem;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--bg-soft) 25%, var(--line) 50%, var(--bg-soft) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; background: var(--bg-soft); }
+}
+
+/* error */
+.field-error {
+  color: var(--copper);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 0.6rem;
+}
+input[aria-invalid="true"], textarea[aria-invalid="true"], select[aria-invalid="true"] {
+  border-color: var(--copper);
+}
+
+/* empty */
+.empty-state {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--ink-soft);
+}
+
+/* text buttons that behave like links */
+.linklike {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--ink-soft);
+  text-decoration: underline;
+  text-align: left;
+  font-size: inherit;
+}
+.linklike:hover { color: var(--ink); }
+
+/* accessibility: skip link (visible on focus only) */
+.skip-link {
+  position: absolute;
+  left: 0.75rem;
+  top: -3rem;
+  z-index: 100;
+  background: var(--ink);
+  color: var(--bg);
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: top 0.15s ease;
+}
+.skip-link:focus-visible { top: 0.75rem; }

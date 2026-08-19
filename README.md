@@ -43,6 +43,7 @@ peptandco.com, peptivane.com.
 | `/science` | Peptide education with honest evidence grades (incl. why we don't sell injectables) |
 | `/quality` | Testing pipeline + **batch/COA lookup by lot number** |
 | `/cart` | Single-page cart + checkout (Stripe or graceful order-request fallback) |
+| `/account` | **Authenticated user area**: sign up / sign in / password reset / email verification (Supabase Auth), order & subscription history via RLS, settings |
 | `/about`, `/contact` | Brand story; contact form with Supabase → mailto fallback |
 | `/legal/*` | Terms, privacy, shipping & returns (starter copy — have counsel review) |
 | `/admin` | **Staff console**: KPIs, orders & billing ledger, inventory with reorder flags, CRM with LTV/segments |
@@ -75,7 +76,10 @@ Schema highlights:
   `subscriptions` and `order_requests` (pre-Stripe fallback orders,
   status `new → invoiced → paid → fulfilled`).
 - **RLS**: anon key can read the catalog and *insert only* into the
-  capture tables; orders/inventory/CRM are service-role only.
+  capture tables; orders/inventory/CRM are service-role only — except
+  that authenticated customers can read **their own** orders and
+  subscriptions (matched on the verified JWT email), which powers
+  `/account` with no extra API surface.
 
 ## Turning on payments (Stripe)
 
@@ -88,12 +92,15 @@ Schema highlights:
    `STRIPE_WEBHOOK_SECRET`. The webhook verifies signatures (HMAC,
    replay-protected), records the order, decrements inventory with
    audit rows, and upserts the CRM customer.
-3. Subscribe & Save: first orders charge the discounted price at
-   checkout today. To automate renewals, create Stripe Products/Prices
-   per SKU and switch `/api/checkout` to `mode=subscription` for
-   subscription lines — the `subscriptions` table is ready for it.
+3. Subscribe & Save is real recurring billing: any subscription line
+   switches the session to `mode=subscription` (every 60 days at −15%,
+   one-time items ride along, shipping folded into the first invoice),
+   and the webhook mirrors the Stripe subscription into the
+   `subscriptions` table for CRM + `/account`.
 
 No Stripe SDK dependency — both routes use Stripe's REST API directly.
+Processor rationale, billing descriptor/receipt/refund configuration,
+and the test-mode verification checklist live in `docs/PAYMENTS.md`.
 
 ## Staff console
 
@@ -119,11 +126,14 @@ SEO (per-page metadata, sitemap, robots with `/admin` disallowed).
 ## Project structure
 
 ```
-app/                 storefront pages, /admin console, /api routes
+app/                 storefront pages, /account area, /admin console, /api routes
 components/          Header, Footer, ProductCard, ProductVisual (procedural
                      SVG art per SKU — swap for photos as they're shot),
                      Reveal, Newsletter
+docs/                project definition, design language, conventions +
+                     prompting method, payments direction (start at CLAUDE.md)
 lib/site.ts          brand identity & compliance copy
+lib/auth.tsx         Supabase Auth context (accounts, reset, verification)
 lib/products.ts      the catalog — single source of truth
 lib/cart.tsx         cart context (localStorage)
 lib/supabase.ts      anon + service clients, graceful fallbacks

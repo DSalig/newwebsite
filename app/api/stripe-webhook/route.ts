@@ -73,23 +73,29 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true, recorded: false });
   }
 
-  const items = lineItems.map((li) => {
-    const product = li.price?.product as unknown as
-      | { metadata?: { slug?: string; sku?: string; subscribe?: string } }
-      | undefined;
-    return {
-      slug: product?.metadata?.slug ?? "unknown",
-      sku: product?.metadata?.sku ?? "unknown",
-      name: li.description,
-      qty: li.quantity ?? 1,
-      total: li.amount_total ?? 0,
-      subscribe: product?.metadata?.subscribe === "true",
-    };
-  });
+  const items = lineItems
+    .map((li) => {
+      const product = li.price?.product as unknown as
+        | { metadata?: { slug?: string; sku?: string; subscribe?: string } }
+        | undefined;
+      return {
+        slug: product?.metadata?.slug ?? "unknown",
+        sku: product?.metadata?.sku ?? "unknown",
+        name: li.description,
+        qty: li.quantity ?? 1,
+        total: li.amount_total ?? 0,
+        subscribe: product?.metadata?.subscribe === "true",
+      };
+    })
+    // The synthetic shipping line in subscription-mode sessions is
+    // billing detail, not a product — keep it out of order items
+    // and inventory.
+    .filter((i) => i.slug !== "shipping");
 
+  const email = session.customer_details?.email ?? session.customer_email ?? "unknown";
   const { error } = await sb.rpc("record_order", {
     p_stripe_session_id: session.id,
-    p_email: session.customer_details?.email ?? session.customer_email ?? "unknown",
+    p_email: email,
     p_name: session.customer_details?.name ?? "",
     p_amount_total: session.amount_total ?? 0,
     p_amount_shipping: session.total_details?.amount_shipping ?? 0,
@@ -102,6 +108,31 @@ export async function POST(req: NextRequest) {
     // 500 → Stripe retries with backoff; record_order is idempotent
     // on stripe_session_id so retries are safe.
     return NextResponse.json({ error: "Recording failed." }, { status: 500 });
+  }
+
+  // Subscription-mode sessions carry the Stripe subscription id —
+  // mirror it into the CRM ledger (Stripe stays money-truth).
+  if (typeof session.subscription === "string" && session.subscription) {
+    const { data: customer } = await sb
+      .from("customers")
+      .select("id")
+      .eq("email", email)
+      .maybeSingle();
+    for (const item of items.filter((i) => i.subscribe)) {
+      const { error: subError } = await sb.from("subscriptions").upsert(
+        {
+          stripe_subscription_id: session.subscription,
+          customer_id: customer?.id ?? null,
+          product_slug: item.slug,
+          qty: item.qty,
+          interval_days: 60,
+          status: "active",
+          next_renewal_at: new Date(Date.now() + 60 * 24 * 3600 * 1000).toISOString(),
+        },
+        { onConflict: "stripe_subscription_id,product_slug" }
+      );
+      if (subError) console.error("subscription upsert failed:", subError.message);
+    }
   }
 
   return NextResponse.json({ received: true });

@@ -3,6 +3,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { CartProvider } from "@/lib/cart";
+import { AuthProvider } from "@/lib/auth";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -61,11 +62,14 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <CartProvider>
-          <Header />
-          <main>{children}</main>
-          <Footer />
-        </CartProvider>
+        <a href="#main" className="skip-link">Skip to content</a>
+        <AuthProvider>
+          <CartProvider>
+            <Header />
+            <main id="main">{children}</main>
+            <Footer />
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

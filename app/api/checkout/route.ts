@@ -39,52 +39,71 @@ export async function POST(req: NextRequest) {
   }
 
   const origin = req.nextUrl.origin;
+  const hasSubscription = items.some((i) => i.subscribe);
   const params = new URLSearchParams();
-  params.set("mode", "payment");
+  // Any subscribe-&-save line puts the whole session in subscription
+  // mode: recurring prices bill every 60 days at the −15% price and
+  // one-time lines ride along on the first invoice.
+  params.set("mode", hasSubscription ? "subscription" : "payment");
   params.set("success_url", `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`);
   params.set("cancel_url", `${origin}/cart`);
   if (body.email) params.set("customer_email", body.email);
   params.set("shipping_address_collection[allowed_countries][0]", "US");
   params.set("metadata[source]", "pepthea-web");
-  params.set("payment_intent_data[metadata][source]", "pepthea-web");
+  if (hasSubscription) {
+    params.set("subscription_data[metadata][source]", "pepthea-web");
+  } else {
+    params.set("payment_intent_data[metadata][source]", "pepthea-web");
+  }
 
   let subtotal = 0;
-  items.forEach((item, i) => {
+  let idx = 0;
+  for (const item of items) {
     const p = getProduct(item.slug)!;
     const unit = item.subscribe ? p.subscribePrice : p.price;
     subtotal += unit * item.qty;
-    params.set(`line_items[${i}][quantity]`, String(item.qty));
-    params.set(`line_items[${i}][price_data][currency]`, "usd");
-    params.set(`line_items[${i}][price_data][unit_amount]`, String(unit));
+    params.set(`line_items[${idx}][quantity]`, String(item.qty));
+    params.set(`line_items[${idx}][price_data][currency]`, "usd");
+    params.set(`line_items[${idx}][price_data][unit_amount]`, String(unit));
+    if (item.subscribe) {
+      params.set(`line_items[${idx}][price_data][recurring][interval]`, "day");
+      params.set(`line_items[${idx}][price_data][recurring][interval_count]`, "60");
+    }
     params.set(
-      `line_items[${i}][price_data][product_data][name]`,
+      `line_items[${idx}][price_data][product_data][name]`,
       p.shortName + (item.subscribe ? " (Subscribe & Save)" : "")
     );
-    params.set(`line_items[${i}][price_data][product_data][metadata][slug]`, p.slug);
-    params.set(`line_items[${i}][price_data][product_data][metadata][sku]`, p.sku);
+    params.set(`line_items[${idx}][price_data][product_data][metadata][slug]`, p.slug);
+    params.set(`line_items[${idx}][price_data][product_data][metadata][sku]`, p.sku);
     params.set(
-      `line_items[${i}][price_data][product_data][metadata][subscribe]`,
+      `line_items[${idx}][price_data][product_data][metadata][subscribe]`,
       item.subscribe ? "true" : "false"
     );
-  });
+    idx++;
+  }
 
-  // NOTE: recurring billing for subscribe-&-save lines is handled
-  // operationally at launch (the first order is charged here at the
-  // discounted price; the Stripe subscription is created from the
-  // admin console / webhook flow). Moving to mode=subscription with
-  // Stripe Prices is the documented upgrade path in the README.
-
-  const shipping =
-    subtotal >= FREE_SHIPPING_THRESHOLD
-      ? 0
-      : FLAT_SHIPPING;
-  params.set("shipping_options[0][shipping_rate_data][type]", "fixed_amount");
-  params.set("shipping_options[0][shipping_rate_data][fixed_amount][amount]", String(shipping));
-  params.set("shipping_options[0][shipping_rate_data][fixed_amount][currency]", "usd");
-  params.set(
-    "shipping_options[0][shipping_rate_data][display_name]",
-    shipping === 0 ? "Free U.S. shipping" : "Standard U.S. shipping"
-  );
+  const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : FLAT_SHIPPING;
+  if (hasSubscription) {
+    // Subscription mode doesn't support shipping_options — when
+    // shipping is owed it becomes a one-time line on the first
+    // invoice. Renewals ship free (60-day cycles clear $50 in
+    // practice; policy documented in docs/PAYMENTS.md).
+    if (shipping > 0) {
+      params.set(`line_items[${idx}][quantity]`, "1");
+      params.set(`line_items[${idx}][price_data][currency]`, "usd");
+      params.set(`line_items[${idx}][price_data][unit_amount]`, String(shipping));
+      params.set(`line_items[${idx}][price_data][product_data][name]`, "Standard U.S. shipping");
+      params.set(`line_items[${idx}][price_data][product_data][metadata][slug]`, "shipping");
+    }
+  } else {
+    params.set("shipping_options[0][shipping_rate_data][type]", "fixed_amount");
+    params.set("shipping_options[0][shipping_rate_data][fixed_amount][amount]", String(shipping));
+    params.set("shipping_options[0][shipping_rate_data][fixed_amount][currency]", "usd");
+    params.set(
+      "shipping_options[0][shipping_rate_data][display_name]",
+      shipping === 0 ? "Free U.S. shipping" : "Standard U.S. shipping"
+    );
+  }
 
   try {
     const res = await fetch("https://api.stripe.com/v1/checkout/sessions", {
