@@ -109,9 +109,20 @@ SHA-256 session cookie, httpOnly). Unset, it runs in labeled demo mode
 so you can review the dashboards before configuring anything.
 
 - **Overview** — 30-day revenue, orders, AOV, low-stock count, restock queue
-- **Orders & Billing** — full ledger with line items and status flow
-- **Inventory** — stock vs. reorder point per SKU with active lot
+- **Orders & Billing** — full ledger with inline status transitions
+  (`pending → paid → shipped → delivered` / refunded)
+- **Inventory** — *editable*: prices, subscribe prices, stock (with
+  audited adjustment movements), reorder points, shop visibility, and
+  a receive-a-batch form (lot + dates + stock + movement in one step)
 - **Customers (CRM)** — LTV-sorted with derived segments (VIP / Subscriber / Repeat / New)
+
+Console edits are live: `lib/catalog.ts` merges the DB's operational
+fields (price, stock, visibility) into the storefront, cart, and
+checkout, with 60s ISR on catalog pages. Writes require both
+`ADMIN_PASSWORD` and Supabase; until then the console is read-only
+demo. Copy/actives/new products stay in `lib/products.ts` — the
+engine/brand split and the full relaunch playbook for spinning up
+sibling sites with a different UI live in **`docs/TEMPLATE.md`**.
 
 ## 2026 UX patterns implemented
 

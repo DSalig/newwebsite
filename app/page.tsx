@@ -3,8 +3,12 @@ import Reveal from "@/components/Reveal";
 import ProductCard from "@/components/ProductCard";
 import ProductVisual from "@/components/ProductVisual";
 import Newsletter from "@/components/Newsletter";
-import { getProduct, products } from "@/lib/products";
+import { getProduct } from "@/lib/products";
+import { getMergedProducts } from "@/lib/catalog";
 import { site } from "@/lib/site";
+
+// ISR so console catalog edits reach the home page within a minute.
+export const revalidate = 60;
 
 const trustItems = [
   "Third-party tested, every batch",
@@ -16,9 +20,10 @@ const trustItems = [
   "Free U.S. shipping over $50",
 ];
 
-export default function HomePage() {
-  const featured = products.filter((x) => x.featured);
-  const hero = getProduct("copper-renewal-serum")!;
+export default async function HomePage() {
+  const merged = await getMergedProducts(true);
+  const featured = merged.filter((x) => x.featured);
+  const hero = merged.find((x) => x.slug === "copper-renewal-serum") ?? getProduct("copper-renewal-serum")!;
 
   return (
     <>

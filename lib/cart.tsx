@@ -37,6 +37,16 @@ interface CartState {
   clear: () => void;
   hasIngestible: boolean;
   hasSubscription: boolean;
+  /** Live price for a line (cents): console-edited value when the
+   *  backend is connected, file-catalog price otherwise. */
+  unitPrice: (slug: string, subscribe: boolean) => number;
+}
+
+interface CatalogOverride {
+  price: number;
+  subscribePrice: number;
+  stock: number;
+  active: boolean;
 }
 
 const CartContext = createContext<CartState | null>(null);
@@ -45,6 +55,22 @@ const STORAGE_KEY = "pepthea-cart-v1";
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);
   const [hydrated, setHydrated] = useState(false);
+  const [overrides, setOverrides] = useState<Record<string, CatalogOverride>>({});
+
+  // Live pricing from the merged catalog; on any failure the file
+  // catalog bundled with the client keeps everything working.
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/catalog")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!cancelled && data && typeof data === "object") setOverrides(data);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     try {
@@ -98,6 +124,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const clear = useCallback(() => setLines([]), []);
 
   const value = useMemo<CartState>(() => {
+    const unitPrice = (slug: string, subscribe: boolean): number => {
+      const o = overrides[slug];
+      if (o) return subscribe ? o.subscribePrice : o.price;
+      const prod = getProduct(slug);
+      return prod ? (subscribe ? prod.subscribePrice : prod.price) : 0;
+    };
     let subtotal = 0;
     let count = 0;
     let hasIngestible = false;
@@ -105,7 +137,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     for (const l of lines) {
       const prod = getProduct(l.slug);
       if (!prod) continue;
-      subtotal += (l.subscribe ? prod.subscribePrice : prod.price) * l.qty;
+      subtotal += unitPrice(l.slug, l.subscribe) * l.qty;
       count += l.qty;
       if (prod.ingestible) hasIngestible = true;
       if (l.subscribe) hasSubscription = true;
@@ -123,8 +155,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       clear,
       hasIngestible,
       hasSubscription,
+      unitPrice,
     };
-  }, [lines, add, remove, setQty, clear]);
+  }, [lines, overrides, add, remove, setQty, clear]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

@@ -7,13 +7,13 @@ import Reveal from "@/components/Reveal";
 import {
   categories,
   concerns,
-  products,
   type Category,
   type Concern,
+  type Product,
 } from "@/lib/products";
 import { site } from "@/lib/site";
 
-export default function ShopClient() {
+export default function ShopClient({ products }: { products: Product[] }) {
   const params = useSearchParams();
   const initialCat = params.get("cat") as Category | null;
   const [cat, setCat] = useState<Category | "All">(
@@ -28,7 +28,7 @@ export default function ShopClient() {
           (cat === "All" || p.category === cat) &&
           (concern === "All" || p.concerns.includes(concern))
       ),
-    [cat, concern]
+    [products, cat, concern]
   );
 
   return (

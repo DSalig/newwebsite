@@ -5,12 +5,17 @@ import ProductVisual from "@/components/ProductVisual";
 import ProductCard from "@/components/ProductCard";
 import Reveal from "@/components/Reveal";
 import { getProduct, products } from "@/lib/products";
+import { getMergedProduct, getMergedProducts } from "@/lib/catalog";
 import { site } from "@/lib/site";
 import BuyPanel from "./BuyPanel";
 
 export function generateStaticParams() {
   return products.map((p) => ({ slug: p.slug }));
 }
+
+// ISR so console price/stock edits reach product pages within a
+// minute without a redeploy.
+export const revalidate = 60;
 
 export async function generateMetadata({
   params,
@@ -29,11 +34,12 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = getProduct(slug);
+  const product = await getMergedProduct(slug);
   if (!product) notFound();
 
+  const merged = await getMergedProducts(true);
   const pairs = product.pairsWith
-    .map((s) => getProduct(s))
+    .map((s) => merged.find((x) => x.slug === s))
     .filter((x): x is NonNullable<typeof x> => Boolean(x));
 
   return (

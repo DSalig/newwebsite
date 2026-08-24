@@ -8,8 +8,9 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   FLAT_SHIPPING,
   FREE_SHIPPING_THRESHOLD,
-  getProduct,
+  type Product,
 } from "@/lib/products";
+import { getMergedProducts } from "@/lib/catalog";
 import { site } from "@/lib/site";
 
 interface CheckoutBody {
@@ -26,8 +27,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
 
+  // Prices come from the merged catalog: console-edited DB values
+  // when Supabase is connected, the file catalog otherwise.
+  const catalog = new Map<string, Product>(
+    (await getMergedProducts(false)).map((p) => [p.slug, p])
+  );
   const items = (body.items ?? []).filter(
-    (i) => getProduct(i.slug) && Number.isInteger(i.qty) && i.qty > 0 && i.qty <= 20
+    (i) => catalog.has(i.slug) && Number.isInteger(i.qty) && i.qty > 0 && i.qty <= 20
   );
   if (items.length === 0) {
     return NextResponse.json({ error: "Cart is empty." }, { status: 400 });
@@ -59,7 +65,7 @@ export async function POST(req: NextRequest) {
   let subtotal = 0;
   let idx = 0;
   for (const item of items) {
-    const p = getProduct(item.slug)!;
+    const p = catalog.get(item.slug)!;
     const unit = item.subscribe ? p.subscribePrice : p.price;
     subtotal += unit * item.qty;
     params.set(`line_items[${idx}][quantity]`, String(item.qty));

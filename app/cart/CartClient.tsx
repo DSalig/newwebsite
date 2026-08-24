@@ -50,7 +50,7 @@ export default function CartClient() {
             name: p.shortName,
             qty: l.qty,
             subscribe: l.subscribe,
-            unit_price: l.subscribe ? p.subscribePrice : p.price,
+            unit_price: cart.unitPrice(l.slug, l.subscribe),
           };
         });
         const ok = await submitOrderRequest({
@@ -126,7 +126,7 @@ export default function CartClient() {
             {cart.lines.map((l) => {
               const p = getProduct(l.slug);
               if (!p) return null;
-              const unit = l.subscribe ? p.subscribePrice : p.price;
+              const unit = cart.unitPrice(l.slug, l.subscribe);
               return (
                 <div key={`${l.slug}-${l.subscribe}`} className="card" style={{ display: "flex", gap: "1rem", padding: "1rem", alignItems: "center" }}>
                   <div style={{ width: "84px", flexShrink: 0 }}>

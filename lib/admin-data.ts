@@ -37,6 +37,8 @@ export interface InventoryRow {
   stock: number;
   reorder_point: number;
   price: number;
+  subscribe_price: number;
+  active: boolean;
 }
 
 export interface AdminSnapshot {
@@ -92,6 +94,8 @@ function demoSnapshot(): AdminSnapshot {
     stock: p.stock,
     reorder_point: p.reorderPoint,
     price: p.price,
+    subscribe_price: p.subscribePrice,
+    active: true,
   }));
   const customers: AdminCustomer[] = DEMO_ORDERS.map((o) => ({
     email: o.email,
@@ -130,7 +134,7 @@ export async function getAdminSnapshot(): Promise<AdminSnapshot> {
       sb.from("customer_overview").select("*").limit(500),
       sb
         .from("products")
-        .select("sku, slug, name, price, reorder_point, inventory(stock), batches(lot)")
+        .select("sku, slug, name, price, subscribe_price, active, reorder_point, inventory(stock), batches(lot)")
         .limit(200),
     ]);
 
@@ -165,10 +169,12 @@ export async function getAdminSnapshot(): Promise<AdminSnapshot> {
       sku: p.sku,
       slug: p.slug,
       name: p.name,
-      lot: (p.batches?.[0] as { lot?: string } | undefined)?.lot ?? "—",
+      lot: (p.batches?.[p.batches.length - 1] as { lot?: string } | undefined)?.lot ?? "—",
       stock: (p.inventory?.[0] as { stock?: number } | undefined)?.stock ?? 0,
       reorder_point: p.reorder_point ?? 0,
       price: p.price,
+      subscribe_price: p.subscribe_price ?? Math.round(p.price * 0.85),
+      active: p.active ?? true,
     }));
 
     const customers: AdminCustomer[] = (customersRes.data ?? []).map(

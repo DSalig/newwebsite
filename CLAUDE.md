@@ -8,6 +8,8 @@ between sessions. The deeper references live in `docs/`:
 - `docs/DESIGN-LANGUAGE.md` — tokens, type, spacing, motion, interaction states
 - `docs/CONVENTIONS.md` — file structure, naming, prompting method
 - `docs/PAYMENTS.md` — processor rationale and billing configuration
+- `docs/TEMPLATE.md` — engine vs. brand layer; how to relaunch this
+  codebase as a new site with a different UI
 
 ## Commands
 
@@ -27,8 +29,13 @@ npm run seed     # regenerate supabase/seed.sql after catalog edits
 2. **No fabricated social proof.** No invented reviews, counts,
    testimonials, or press. Trust is carried by transparency features
    (disclosed doses, batch COAs), not manufactured signals.
-3. **Prices live in `lib/products.ts` only** (cents). The client never
-   sends prices to the server; `/api/checkout` re-resolves them.
+3. **Prices are never trusted from the client.** Base prices live in
+   `lib/products.ts` (cents); once Supabase is connected the staff
+   console owns the operational fields (price, subscribe price,
+   stock, visibility, reorder point) and `lib/catalog.ts` merges
+   them into every server read — including `/api/checkout`, which
+   always re-resolves prices server-side. Copy, actives, and new
+   products stay in `lib/products.ts` (see docs/TEMPLATE.md).
 4. **Graceful degradation.** Every feature must work with zero env
    vars: Supabase absent → mailto/demo fallbacks; Stripe absent →
    order-request capture; ADMIN_PASSWORD absent → labeled demo console.
