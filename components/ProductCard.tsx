@@ -1,33 +1,22 @@
 import Link from "next/link";
-import ProductVisual from "./ProductVisual";
-import { formatPrice, getCategory, type Product } from "@/lib/products";
+import type { Product } from "@/lib/products";
+import { formatPrice } from "@/lib/products";
+import ProductVisual from "@/components/ProductVisual";
 
 export default function ProductCard({ product }: { product: Product }) {
-  const cat = getCategory(product.category);
   return (
     <Link href={`/products/${product.slug}`} className="product-card">
-      <div className="product-art">
-        <ProductVisual
-          slug={product.slug}
-          kind={product.art}
-          palette={product.palette}
-          size={210}
-          alt={product.name}
-        />
-      </div>
-      <div className="product-body">
-        <span className="mono-note">{cat?.short.toUpperCase()} · {product.sku}</span>
-        <h3>{product.name}</h3>
-        <p style={{ color: "var(--text-dim)", fontSize: 14.5 }}>{product.blurb}</p>
-        <div className="product-meta">
-          <span className="price">
-            {formatPrice(product.price)}
-            <small>{product.priceNote}</small>
-          </span>
-          <span className="mono-note">
-            {product.leadTimeWeeks[0]}–{product.leadTimeWeeks[1]} wks
-          </span>
+      <ProductVisual product={product} />
+      <div>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: "0.5rem" }}>
+          <strong>{product.shortName}</strong>
+          <span>{formatPrice(product.price)}</span>
         </div>
+        <p className="small muted">{product.tagline}</p>
+        <p className="mono muted" style={{ marginTop: "0.3rem" }}>
+          {product.size}
+          {product.ingestible && " · supplement*"}
+        </p>
       </div>
     </Link>
   );

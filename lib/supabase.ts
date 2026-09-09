@@ -1,6 +1,6 @@
-// Supabase wiring. The site degrades gracefully when the env
-// vars are absent (e.g. local preview before a project is
-// provisioned): forms fall back to a mailto handoff and the
+// Supabase wiring. The site degrades gracefully when env vars are
+// absent (e.g. local preview before a project is provisioned):
+// checkout falls back to order-request capture → mailto, and the
 // catalog serves from lib/products.ts.
 
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
@@ -18,24 +18,14 @@ export function getSupabase(): SupabaseClient | null {
   return client;
 }
 
-export interface LeadPayload {
-  name: string;
-  email: string;
-  phone?: string;
-  interest: string;
-  message: string;
-  source: string;
-}
-
-export interface OrderRequestPayload {
-  product_slug: string;
-  product_name: string;
-  sku: string;
-  options: Record<string, string>;
-  quantity: number;
-  name: string;
-  email: string;
-  notes?: string;
+// Server-only privileged client for the admin dashboard and the
+// Stripe webhook (bypasses RLS). Never import from client code.
+export function getSupabaseAdmin(): SupabaseClient | null {
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !serviceKey) return null;
+  return createClient(url, serviceKey, {
+    auth: { persistSession: false },
+  });
 }
 
 /** Resolve to `fallback` if the promise hasn't settled in `ms` —
@@ -50,9 +40,7 @@ function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
 const SUBMIT_TIMEOUT_MS = 8000;
 
 /** Insert into a table; returns true on success, false on any
- *  failure — unconfigured client, RLS/permission error, a hard
- *  network throw, or a stalled connection — so callers can always
- *  fall back to mailto. */
+ *  failure so callers can always fall back to mailto. */
 async function tryInsert(table: string, payload: object): Promise<boolean> {
   const sb = getSupabase();
   if (!sb) return false;
@@ -63,43 +51,43 @@ async function tryInsert(table: string, payload: object): Promise<boolean> {
   return withTimeout(attempt, SUBMIT_TIMEOUT_MS, false);
 }
 
+export interface OrderRequestPayload {
+  email: string;
+  name: string;
+  items: { slug: string; name: string; qty: number; subscribe: boolean; unit_price: number }[];
+  subtotal: number;
+  notes?: string;
+  source: string;
+}
+
+/** Captured when Stripe isn't configured yet — a human follows up
+ *  with a payment link. Lands in `order_requests`. */
+export async function submitOrderRequest(payload: OrderRequestPayload): Promise<boolean> {
+  return tryInsert("order_requests", payload);
+}
+
+export interface LeadPayload {
+  email: string;
+  name?: string;
+  topic: string;
+  message?: string;
+  source: string;
+}
+
 export async function submitLead(payload: LeadPayload): Promise<boolean> {
   return tryInsert("leads", payload);
 }
 
-export async function submitOrderRequest(
-  payload: OrderRequestPayload
-): Promise<boolean> {
-  return tryInsert("order_requests", payload);
+export async function subscribeNewsletter(email: string, source: string): Promise<boolean> {
+  return tryInsert("newsletter_subscribers", { email, source });
 }
 
-export interface DesignerReferralPayload {
-  name: string;
-  email: string;
-  location: string;
-  notes?: string;
-  context: Record<string, unknown>;
-  context_summary: string;
+export interface QuizSessionPayload {
+  answers: Record<string, string>;
+  routine_slugs: string[];
+  email?: string;
 }
 
-export async function submitDesignerReferral(
-  payload: DesignerReferralPayload
-): Promise<boolean> {
-  return tryInsert("designer_referrals", payload);
-}
-
-export interface DesignerApplicationPayload {
-  name: string;
-  studio: string;
-  email: string;
-  location: string;
-  specialties: string[];
-  portfolio_url?: string;
-  message?: string;
-}
-
-export async function submitDesignerApplication(
-  payload: DesignerApplicationPayload
-): Promise<boolean> {
-  return tryInsert("designer_applications", payload);
+export async function submitQuizSession(payload: QuizSessionPayload): Promise<boolean> {
+  return tryInsert("quiz_sessions", payload);
 }

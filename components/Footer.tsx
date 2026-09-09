@@ -1,70 +1,57 @@
+"use client";
+
 import Link from "next/link";
-import { CREDENTIALS } from "@/lib/site";
+import { usePathname } from "next/navigation";
+import { site } from "@/lib/site";
+import Newsletter from "@/components/Newsletter";
 
 export default function Footer() {
+  const pathname = usePathname();
+  if (pathname?.startsWith("/admin")) return null;
+
   return (
-    <footer className="site-footer">
-      <div
-        className="glow-orb breathe"
-        style={{
-          width: 420,
-          height: 220,
-          background: "var(--candela-glow)",
-          bottom: -140,
-          left: "50%",
-          transform: "translateX(-50%)",
-        }}
-        aria-hidden="true"
-      />
-      <div className="container">
-        <div className="footer-grid">
-          <div>
-            <div className="logo" style={{ marginBottom: 14 }}>
-              <span className="logo-mark" aria-hidden="true" />
-              Lumenwright
+    <footer className="footer">
+      <div className="wrap">
+        <div className="grid cols-4">
+          <div style={{ gridColumn: "span 1" }}>
+            <div className="logo" style={{ color: "#f0ede4", marginBottom: "0.8rem" }}>
+              Pep<span>thea</span>
             </div>
-            <p style={{ color: "var(--text-dim)", fontSize: 14.5, maxWidth: "34ch" }}>
-              The light atelier. Custom installations, vintage rehabilitation,
-              rare chandelier repair, and turnkey LED conversion — design
-              through fabrication through five years of service.
-            </p>
-            <p className="mono-note" style={{ marginTop: 18 }}>
-              {CREDENTIALS}
-            </p>
-          </div>
-          <div>
-            <h4>Studio</h4>
-            <ul>
-              <li><Link href="/services">Custom installations</Link></li>
-              <li><Link href="/services#restoration">Vintage rehabilitation</Link></li>
-              <li><Link href="/services#chandelier">Chandelier repair</Link></li>
-              <li><Link href="/retrofit">Turnkey LED retrofit</Link></li>
-              <li><Link href="/studio">AI lighting studio</Link></li>
-              <li><Link href="/designers">Designer network</Link></li>
-            </ul>
+            <p style={{ maxWidth: "22rem", color: "#b9c4ba" }}>{site.tagline}</p>
           </div>
           <div>
             <h4>Shop</h4>
-            <ul>
-              <li><Link href="/products?cat=custom-chandeliers">Chandeliers</Link></li>
-              <li><Link href="/products?cat=pendants">Pendants</Link></li>
-              <li><Link href="/products?cat=sconces-wall">Sconces</Link></li>
-              <li><Link href="/products?cat=vintage-restored">Vintage &amp; restored</Link></li>
-              <li><Link href="/products?cat=vela-series">Vela Series LED</Link></li>
-            </ul>
+            <p><Link href="/shop">All products</Link></p>
+            <p><Link href="/shop?cat=Serums">Serums</Link></p>
+            <p><Link href="/shop?cat=Ingestibles">Collagen</Link></p>
+            <p><Link href="/quiz">Routine Builder</Link></p>
           </div>
           <div>
-            <h4>Company</h4>
-            <ul>
-              <li><Link href="/about">About the atelier</Link></li>
-              <li><Link href="/trade">Trade &amp; partners</Link></li>
-              <li><Link href="/contact">Contact</Link></li>
-            </ul>
+            <h4>Learn</h4>
+            <p><Link href="/science">The Science</Link></p>
+            <p><Link href="/quality">Testing &amp; COAs</Link></p>
+            <p><Link href="/about">About</Link></p>
+            <p><Link href="/contact">Contact</Link></p>
+          </div>
+          <div>
+            <h4>Stay in the loop</h4>
+            <Newsletter compact />
+            <p className="small" style={{ marginTop: "0.8rem", color: "#97a698" }}>
+              One useful email a month. No spam, ever.
+            </p>
           </div>
         </div>
-        <div className="footer-bottom">
-          <span>© {new Date().getFullYear()} Lumenwright Atelier. All rights reserved.</span>
-          <span>Serving residential, hospitality &amp; commercial clients.</span>
+
+        <div className="footer-legal">
+          <p style={{ marginBottom: "0.6rem" }}>{site.fdaDisclaimer}</p>
+          <p style={{ marginBottom: "0.6rem" }}>{site.complianceNote}</p>
+          <p>
+            © {new Date().getFullYear()} {site.name} ·{" "}
+            <Link href="/legal/terms">Terms</Link> ·{" "}
+            <Link href="/legal/privacy">Privacy</Link> ·{" "}
+            <Link href="/legal/shipping-returns">Shipping &amp; Returns</Link> ·{" "}
+            <a href={`mailto:${site.email.hello}`}>{site.email.hello}</a>
+          </p>
         </div>
       </div>
     </footer>
